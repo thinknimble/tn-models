@@ -27,5 +27,5 @@ This will read the alias you created from your shell environment. To reload your
 With your private token configured, you can now install this package as you would any other NPM package.
 
 ```bash
-npm install thinknimble@tn-models
+npm install @thinknimble/tn-models
 ```
