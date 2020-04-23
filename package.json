@@ -1,0 +1,49 @@
+{
+  "name": "@thinknimble/tn-models",
+  "version": "1.0.0",
+  "description": "Utilities for building front-end models.",
+  "author": "William Huster <william@thinknimble.com>",
+  "license": "SEE LICENSE IN LICENSE.TXT",
+  "main": "lib/index.js",
+  "scripts": {
+    "compile": "babel src -d lib",
+    "prepublish": "npm run compile",
+    "test": "mocha --require @babel/register"
+  },
+  "directories": {
+    "lib": "./src",
+    "test": "./test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://bitbucket.org/thinknimble/tn-models.git"
+  },
+  "keywords": [
+    "javascript"
+  ],
+  "homepage": "https://bitbucket.org/thinknimble/tn-models#readme",
+  "dependencies": {
+    "@thinknimble/tn-utils": "^1.4.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/register": "^7.9.0",
+    "mocha": "^7.1.1"
+  },
+  "babel": {
+    "plugins": [
+      "@babel/plugin-proposal-class-properties"
+    ],
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "useBuiltIns": false
+        }
+      ]
+    ]
+  }
+}

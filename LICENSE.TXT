@@ -1,0 +1,9 @@
+Copyright 2020, ThinkNimble LLC
+
+ThinkNimble LLC does not grant its clients, agents, or third parties permission to
+use, remix, or distribute this software outside of the context of custom software
+built for the client by ThinkNimble.
+
+ThinkNimble grants its clients a perpetual and free license to use this software,
+so long as this software is included in the custom applications built for the
+client by ThinkNimble.
