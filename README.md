@@ -4,7 +4,7 @@
 
 To install, you must be a member of the ThinkNimble NPM organization. If you are not, please contact William <william@thinknimble.com> to invite you to the organization.
 
-Once invited, you should be able to get the private token associated with your account. The following steps describe
+Once invited, you should be able to get the private token associated with your account. The following steps describe how to configure your computer to use this token.
 
 ### Configure NPM to Use Your Private Token
 
