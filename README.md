@@ -11,7 +11,7 @@ Once invited, you should be able to get the private token associated with your a
 Once you get your private token from NPM's website, create an alias in your `.bashrc` or `.bash_profile`:
 
 ```bash
-alias NPM_PRIVATE_TOKEN="{your_private_token}"
+export NPM_PRIVATE_TOKEN="{your_private_token}"
 ```
 
 Then in your project, you can create a `.npmrc` configuration file with the following content:
