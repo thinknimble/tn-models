@@ -5,9 +5,11 @@
  *
  * @author  William Huster <william@thinknimble.com>
  */
-import { notNullOrUndefined } from "../validation";
+import { notUndefined } from '../validation'
 
-import { Field } from "./fields";
+import { objectToCamelCase } from '@thinknimble/tn-utils'
+
+import { Field } from './fields'
 
 export default class Model {
   constructor(kwargs = {}) {
@@ -24,18 +26,22 @@ export default class Model {
     for (const fieldName in this._fields) {
       const field = this._fields[fieldName];
 
-      if (notNullOrUndefined(kwargs[fieldName])) {
-        this[fieldName] = kwargs[fieldName];
-        continue;
-      }
-
-      if (notNullOrUndefined(field.defaultVal)) {
-        if (typeof field.defaultVal === "function") {
-          this[fieldName] = field.defaultVal();
-        } else {
-          this[fieldName] = field.defaultVal;
-        }
-      }
+      this[fieldName] = field.clean(kwargs[fieldName])
     }
+  }
+
+  /**
+   * Static Factory Methods
+   *
+   * Because these are `static`, `this === SubClass`, which means
+   * that `new this()` will invoke the constructor of the subclass,
+   * giving us a new instance of type `SubClass`!
+   */
+  static create(opts = {}) {
+    return new this(opts)
+  }
+
+  static fromAPI(json = {}) {
+    return new this(objectToCamelCase(json))
   }
 }
