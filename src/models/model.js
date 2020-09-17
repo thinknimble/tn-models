@@ -89,12 +89,16 @@ export default class Model {
       data = obj
     }
 
+    // Delete private '_fields' member
+    delete data['_fields']
+
     // Remove read only and excluded fields
     [
       ...this.getReadOnlyFields(),
       ...excludeFields
     ].forEach(item => { delete data[item] })
 
+    console.log('Model.toAPI.getReadOnlyFields():', this.getReadOnlyFields())
     console.log('Model.toAPI.data:', data)
 
     return objectToSnakeCase(data)
