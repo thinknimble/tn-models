@@ -1,11 +1,11 @@
-import Model, { fields, API } from './models'
+import Model, { fields, ModelAPI } from './models'
 import { CollectionManager, pagination } from './collections'
 import validation from './validation'
 
 export {
   Model,
   fields,
-  API,
+  ModelAPI,
   validation,
   CollectionManager,
   pagination,
