@@ -90,13 +90,10 @@ export default class Model {
     }
 
     // Delete private '_fields' member
-    delete data['_fields']
+    delete data['_fields'];
 
     // Remove read only and excluded fields
-    [
-      ...this.getReadOnlyFields(),
-      ...excludeFields
-    ].forEach(item => { delete data[item] })
+    [...this.getReadOnlyFields(), ...excludeFields].forEach(item => { delete data[item] })
 
     console.log('Model.toAPI.getReadOnlyFields():', this.getReadOnlyFields())
     console.log('Model.toAPI.data:', data)
