@@ -92,7 +92,7 @@ export class ArrayField extends Field {
 
   clean(value) {
     return notNullOrUndefined(value) && isArray(value)
-      ? value.map(i => type.clean(i))
+      ? value.map(i => this.type.clean(i))
       : this.getDefaultVal()
   }
 }
