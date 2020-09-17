@@ -6,8 +6,8 @@
  */
 import fields from "./fields";
 import Model from "./model";
-import API from './api'
+import ModelAPI from './api'
 
-export { fields, API };
+export { fields, ModelAPI };
 
 export default Model;
