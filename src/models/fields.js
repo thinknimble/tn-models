@@ -9,8 +9,8 @@ import { random } from "@thinknimble/tn-utils";
 import { notNullOrUndefined, isFunction, isArray } from '../validation'
 
 export class Field {
-  constructor({ defaultVal = null } = {}) {
-    Object.assign(this, { defaultVal });
+  constructor({ defaultVal = null, readOnly = false } = {}) {
+    Object.assign(this, { defaultVal, readOnly });
   }
 
   /**
@@ -70,7 +70,6 @@ export class IdField extends Field {
 }
 
 export class IntegerField extends Field {
-
   clean(value) {
     return notNullOrUndefined(value)
       ? Number(value)
@@ -81,6 +80,7 @@ export class IntegerField extends Field {
 export class ArrayField extends Field {
   constructor({
     defaultVal = null,
+    readOnly = false,
     type = null,
   } = {}) {
     if (!type) {
@@ -103,6 +103,7 @@ export class ArrayField extends Field {
 export class ModelField extends Field {
   constructor({
     defaultVal = null,
+    readOnly = false,
     ModelClass = null,
     many = false,
   } = {}) {
