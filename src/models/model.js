@@ -7,7 +7,7 @@
  */
 import { notUndefined } from '../validation'
 
-import { objectToCamelCase } from '@thinknimble/tn-utils'
+import { objectToCamelCase, objectToSnakeCase } from '@thinknimble/tn-utils'
 
 import { Field } from './fields'
 
@@ -43,5 +43,36 @@ export default class Model {
 
   static fromAPI(json = {}) {
     return new this(objectToCamelCase(json))
+  }
+
+  /**
+   * To API Method
+   *
+   * Convert an instance of this class to a plain old JavaScript object
+   * suitable for JSON serialization and submitting to the API.
+   */
+  static toAPI(obj, fields = [], excludeFields = []) {
+    // By default, send the whole object
+    let data = {}
+
+    // If it's a partial update, get only the fields specified
+    if (fields.length > 0) {
+      fields.forEach(field => {
+        data[field] = obj[field]
+      })
+    } else {
+      data = obj
+    }
+
+    // Remove read only and excluded fields
+    excludeFields = [
+      ...this.constructor.readOnlyFields,
+      ...excludeFields,
+    ]
+    excludeFields.forEach(item => {
+      delete data[item]
+    })
+
+    return objectToSnakeCase(data)
   }
 }

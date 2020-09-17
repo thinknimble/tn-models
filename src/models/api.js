@@ -28,7 +28,7 @@ export default class ModelAPI {
   }
 
   list({ filters = {}, pagination = {} }) {
-    const url = this.construtor.ENDPOINT
+    const url = this.constructor.ENDPOINT
     const options = {
       params: {
         ...filters,
@@ -41,5 +41,22 @@ export default class ModelAPI {
         ...data,
         results: data.results.map(this.cls.fromAPI),
       }))
+  }
+
+  create(data, fields = [], excludeFields = []) {
+    const url = this.constructor.ENDPOINT
+    const data = this.cls.toAPI(data)
+    const authHeader = await Auth.getAuthorizationHeader()
+    const options = {
+      headers: {
+        ...authHeader,
+      },
+    }
+
+    return axios
+      .post(url, data, options)
+      .then(response => response.data)
+      .then(this.cls.fromAPI)
+      .catch(apiErrorHandler({ apiName: 'Create Event API error' }))
   }
 }
