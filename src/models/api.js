@@ -43,6 +43,15 @@ export default class ModelAPI {
       }))
   }
 
+  retrieve(id) {
+    const url = `${this.constructor.ENDPOINT}${id}/`
+    const options = {}
+
+    return axios
+      .get(url, options)
+      .then(response => this.cls.fromAPI(response.data))
+  }
+
   create(obj, fields = [], excludeFields = []) {
     const url = this.constructor.ENDPOINT
     const data = this.cls.toAPI(obj)
