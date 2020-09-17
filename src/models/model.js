@@ -39,7 +39,7 @@ export default class Model {
   // Gather read-only fields
   static getReadOnlyFields() {
     //
-    const legacyReadOnlyFields = this.readOnlyFields
+    const legacyReadOnlyFields = this.readOnlyFields ? this.readOnlyFields : []
 
     //
     let readOnlyFields = []
