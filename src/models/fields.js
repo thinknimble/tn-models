@@ -30,6 +30,21 @@ export class Field {
   }
 }
 
+export class BooleanField extends Field {
+  constructor(opts) {
+    super({
+      ...opts,
+      defaultVal: false
+    });
+  }
+
+  clean(value) {
+    return notNullOrUndefined(value)
+      ? Boolean(value)
+      : this.getDefaultVal()
+  }
+}
+
 export class CharField extends Field {
   constructor(opts) {
     super({
@@ -113,6 +128,7 @@ export class ModelField extends Field {
 
 export default {
   Field,
+  BooleanField,
   CharField,
   IdField,
   IntegerField,
