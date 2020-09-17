@@ -86,7 +86,7 @@ export class ArrayField extends Field {
     if (!type) {
       throw Error('`type` is a required parameter for ArrayField')
     }
-    super({ defaultVal })
+    super({ defaultVal, readOnly })
     Object.assign(this, { type })
   }
 
@@ -110,7 +110,7 @@ export class ModelField extends Field {
     if (!ModelClass) {
       throw Error('ModelClass is a required parameter for ModelField')
     }
-    super({ defaultVal })
+    super({ defaultVal, readOnly })
     Object.assign(this, { ModelClass, many })
   }
 
