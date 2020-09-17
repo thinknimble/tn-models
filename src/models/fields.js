@@ -116,5 +116,6 @@ export default {
   CharField,
   IdField,
   IntegerField,
+  ArrayField,
   ModelField,
 };

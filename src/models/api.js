@@ -26,4 +26,20 @@ export default class ModelAPI {
     }
     return this.constructor.client
   }
+
+  list({ filters = {}, pagination = {} }) {
+    const url = this.construtor.ENDPOINT
+    const options = {
+      params: {
+        ...filters,
+      },
+    }
+    return this.client
+      .get(url, options)
+      .then(response => response.data)
+      .then(data => ({
+        ...data,
+        results: data.results.map(this.cls.fromAPI),
+      }))
+  }
 }
