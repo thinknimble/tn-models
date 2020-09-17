@@ -15,12 +15,7 @@ export default class Model {
   constructor(kwargs = {}) {
     // Collect the fields defined as static properties into
     // a private `_fields` object.
-    this._fields = {};
-    for (const prop in this.constructor) {
-      if (this.constructor[prop] instanceof Field) {
-        this._fields[prop] = this.constructor[prop];
-      }
-    }
+    this._fields = this.constructor.getFields()
 
     // Loop over fields and assign kwarg values to this instance
     for (const fieldName in this._fields) {
@@ -28,6 +23,36 @@ export default class Model {
 
       this[fieldName] = field.clean(kwargs[fieldName])
     }
+  }
+
+  // Gather `static` fields
+  static getFields() {
+    const fields = {}
+    for (const prop in this) {
+      if (this[prop] instanceof Field) {
+        fields[prop] = this[prop]
+      }
+    }
+    return fields
+  }
+
+  // Gather read-only fields
+  static getReadOnlyFields() {
+    //
+    const legacyReadOnlyFields = this.readOnlyFields
+
+    //
+    let readOnlyFields = []
+    for (const [key, value] of Object.entries(this.getFields())) {
+      if (value.readOnly === true) {
+        readOnlyFields.push(key)
+      }
+    }
+
+    return [
+      ...legacyReadOnlyFields,
+      ...readOnlyFields,
+    ]
   }
 
   /**
@@ -65,13 +90,10 @@ export default class Model {
     }
 
     // Remove read only and excluded fields
-    excludeFields = [
-      ...this.constructor.readOnlyFields,
-      ...excludeFields,
-    ]
-    excludeFields.forEach(item => {
-      delete data[item]
-    })
+    [
+      ...this.getReadOnlyFields(),
+      ...excludeFields
+    ].forEach(item => { delete data[item] })
 
     return objectToSnakeCase(data)
   }
