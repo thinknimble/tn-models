@@ -10,7 +10,7 @@ export default class ModelAPI {
   }
 
   static create(cls) {
-    return new this.constructor(cls)
+    return new this(cls)
   }
 
   /**
