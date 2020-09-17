@@ -4,14 +4,14 @@
 
 To install, you must be a member of the ThinkNimble NPM organization. If you are not, please contact William <william@thinknimble.com> to invite you to the organization.
 
-Once invited, you should be able to get the private token associated with your account. The following steps describe
+Once invited, you should be able to get the private token associated with your account. The following steps describe how to configure your computer to use this token.
 
 ### Configure NPM to Use Your Private Token
 
 Once you get your private token from NPM's website, create an alias in your `.bashrc` or `.bash_profile`:
 
 ```bash
-alias NPM_PRIVATE_TOKEN="{your_private_token}"
+export NPM_PRIVATE_TOKEN="{your_private_token}"
 ```
 
 Then in your project, you can create a `.npmrc` configuration file with the following content:
