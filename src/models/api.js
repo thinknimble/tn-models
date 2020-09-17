@@ -47,7 +47,7 @@ export default class ModelAPI {
     const url = `${this.constructor.ENDPOINT}${id}/`
     const options = {}
 
-    return axios
+    return this.client
       .get(url, options)
       .then(response => this.cls.fromAPI(response.data))
   }
