@@ -46,14 +46,8 @@ export default class ModelAPI {
   create(data, fields = [], excludeFields = []) {
     const url = this.constructor.ENDPOINT
     const data = this.cls.toAPI(data)
-    const authHeader = await Auth.getAuthorizationHeader()
-    const options = {
-      headers: {
-        ...authHeader,
-      },
-    }
 
-    return axios
+    return this.client
       .post(url, data, options)
       .then(response => response.data)
       .then(this.cls.fromAPI)
