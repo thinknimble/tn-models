@@ -60,6 +60,6 @@ export default class ModelAPI {
     return this.client
       .post(url, data, options)
       .then(response => response.data)
-      .then(this.cls.fromAPI)
+      .then(data => this.cls.fromAPI(data))
   }
 }
