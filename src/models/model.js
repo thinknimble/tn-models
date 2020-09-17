@@ -95,6 +95,8 @@ export default class Model {
       ...excludeFields
     ].forEach(item => { delete data[item] })
 
+    console.log('Model.toAPI.data:', data)
+
     return objectToSnakeCase(data)
   }
 }
