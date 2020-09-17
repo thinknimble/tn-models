@@ -52,6 +52,5 @@ export default class ModelAPI {
       .post(url, data, options)
       .then(response => response.data)
       .then(this.cls.fromAPI)
-      .catch(apiErrorHandler({ apiName: 'Create Event API error' }))
   }
 }
