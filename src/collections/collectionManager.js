@@ -37,6 +37,7 @@ export default class CollectionManager {
    *                           current list if false. Defaults to `false`.
    */
   update(data, append = false) {
+    console.log('CollectionManager.update.data:', data)
     this.list = [...(append ? this.list : []), ...data.results]
     this.pagination = {
       ...this.pagination,
@@ -57,6 +58,7 @@ export default class CollectionManager {
         pagination: this.pagination,
         filters: this.filters,
       })
+      console.log('CollectionManager.refresh.response:', response)
       return this.update(response)
     } finally {
       this.refreshing = false
