@@ -1,5 +1,5 @@
 import Model, { fields, ModelAPI, ApiFilter } from './models'
-import { CollectionManager, pagination } from './collections'
+import { CollectionManager, Pagination } from './collections'
 import validation from './validation'
 
 export {
@@ -9,7 +9,7 @@ export {
   ApiFilter,
   validation,
   CollectionManager,
-  pagination,
+  Pagination,
 }
 
 export default Model
