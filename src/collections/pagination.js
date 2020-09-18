@@ -23,15 +23,6 @@ export default class Pagination {
     return Math.ceil(totalCount / size)
   }
 
-
-  calcTotalPages() {
-    const { totalCount, size } = this
-    if (!totalCount) {
-      return null
-    }
-    return Math.ceil(totalCount / size)
-  }
-
   setNextPage() {
     if (!this.hasNextPage) return
     this.page++
@@ -42,12 +33,21 @@ export default class Pagination {
     this.page--
   }
 
+  get totalPages() {
+    const { totalCount, size } = this
+    if (!totalCount) {
+      return null
+    }
+    return Math.ceil(totalCount / size)
+  }
+
+
   get hasPrevPage() {
     return this.page > 1
   }
 
   get hasNextPage() {
-    return this.calcTotalPages() && this.page !== this.calcTotalPages()
+    return this.totalPages && this.page !== this.totalPages
   }
 
   get currentPageStart() {
