@@ -44,7 +44,7 @@ export default class ModelAPI {
     const url = this.constructor.ENDPOINT
     const filtersMap = this.constructor.FILTERS_MAP
     const options = {
-      params: params: ApiFilter.buildParams(filtersMap, filters),
+      params: ApiFilter.buildParams(filtersMap, filters),
     }
     return this.client
       .get(url, options)
