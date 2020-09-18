@@ -39,7 +39,7 @@ export default class ModelAPI {
       .then(response => response.data)
       .then(data => ({
         ...data,
-        results: data.results.map(this.cls.fromAPI),
+        results: data.results.map(i => this.cls.fromAPI(i)),
       }))
   }
 
