@@ -44,7 +44,11 @@ export default class ModelAPI {
     const url = this.constructor.ENDPOINT
     const filtersMap = this.constructor.FILTERS_MAP
     const options = {
-      params: ApiFilter.buildParams(filtersMap, filters),
+      params: ApiFilter.buildParams(filtersMap, {
+        ...filters,
+        page: pagination.page,
+        pageSize: pagination.size
+      }),
     }
     return this.client
       .get(url, options)
