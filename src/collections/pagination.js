@@ -11,7 +11,7 @@ export default class Pagination {
     Object.assign(this, PaginationDefaults, opts)
   }
 
-  create(opts = {}) {
+  static create(opts = {}) {
     return new Pagination(opts)
   }
 
@@ -21,7 +21,7 @@ export default class Pagination {
       return null
     }
     return Math.ceil(totalCount / size)
-  },
+  }
 
 
   calcTotalPages() {
