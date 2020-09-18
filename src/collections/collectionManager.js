@@ -54,6 +54,7 @@ export default class CollectionManager {
   async refresh() {
     this.refreshing = true
     try {
+      console.log('CollectionManager.ModelClass:', this.ModelClass)
       const response = await this.ModelClass.api.list({
         pagination: this.pagination,
         filters: this.filters,
