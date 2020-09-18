@@ -33,12 +33,12 @@ export default class Pagination {
   }
 
   setNextPage() {
-    if (this.page === this.calcTotalPages) return
+    if (!this.hasNextPage) return
     this.page++
   }
 
   setPrevPage() {
-    if (this.page === 1) return
+    if (!this.hasPrevPage) return
     this.page--
   }
 
@@ -47,7 +47,7 @@ export default class Pagination {
   }
 
   get hasNextPage() {
-    return this.calcTotalPages(this) && this.page !== this.calcTotalPages(this)
+    return this.calcTotalPages() && this.page !== this.calcTotalPages()
   }
 
   get currentPageStart() {
