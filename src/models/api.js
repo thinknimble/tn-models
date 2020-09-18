@@ -4,7 +4,20 @@
  *
  * @author  William Huster <william@thinknimble.com>
  */
+import ApiFilter from './apiFilter'
+
 export default class ModelAPI {
+  // This is a good default filter map for most models, but could
+  // be overriden on ModelAPI subclasses.
+  static FILTERS_MAP = {
+    // Pagination
+    page: ApiFilter.create({ key: 'page' }),
+    pageSize: ApiFilter.create({ key: 'page_size' }),
+
+    // Sorting
+    ordering: ApiFilter.create({ key: 'ordering' }),
+  }
+
   constructor(cls) {
     this.cls = cls
   }
@@ -29,10 +42,9 @@ export default class ModelAPI {
 
   list({ filters = {}, pagination = {} }) {
     const url = this.constructor.ENDPOINT
+    const filtersMap = this.constructor.FILTERS_MAP
     const options = {
-      params: {
-        ...filters,
-      },
+      params: params: ApiFilter.buildParams(filtersMap, filters),
     }
     return this.client
       .get(url, options)
