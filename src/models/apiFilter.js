@@ -23,7 +23,7 @@ export function isDefinedAndNotNull(value) {
   return isNotNull(value) && isDefined(value)
 }
 
-export class ApiFilter {
+export default class ApiFilter {
   static validators = {
     isNotNull,
     isDefined,
