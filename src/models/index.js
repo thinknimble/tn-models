@@ -4,10 +4,9 @@
  *
  * @author  William Huster <william@thinknimble.com>
  */
-import fields from "./fields";
 import Model from "./model";
-import ModelAPI from './api'
-
-export { fields, ModelAPI };
+export { default as fields } from "./fields";
+export { default as ModelAPI } from './api'
+export { default as ApiFilter } from './apiFilter'
 
 export default Model;

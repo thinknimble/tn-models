@@ -6,17 +6,56 @@ const PaginationDefaults = {
   size: 25,
 }
 
-const Pagination = {
-  create(opts = {}) {
-    return Object.assign(Object.create(Pagination), PaginationDefaults, { ...opts })
-  },
-  calcTotalPages(pagination) {
+export default class Pagination {
+  constructor(opts) {
+    Object.assign(this, PaginationDefaults, opts)
+  }
+
+  static create(opts = {}) {
+    return new Pagination(opts)
+  }
+
+  static calcTotalPages(pagination) {
     const { totalCount, size } = pagination
     if (!totalCount) {
       return null
     }
     return Math.ceil(totalCount / size)
-  },
+  }
+
+  setNextPage() {
+    if (!this.hasNextPage) return
+    this.page++
+  }
+
+  setPrevPage() {
+    if (!this.hasPrevPage) return
+    this.page--
+  }
+
+  get totalPages() {
+    const { totalCount, size } = this
+    if (!totalCount) {
+      return null
+    }
+    return Math.ceil(totalCount / size)
+  }
+
+
+  get hasPrevPage() {
+    return this.page > 1
+  }
+
+  get hasNextPage() {
+    return this.totalPages && this.page !== this.totalPages
+  }
+
+  get currentPageStart() {
+    return this.page > 1 ? (this.page - 1) * this.size : 1
+  }
+
+  get currentPageEnd() {
+    return Math.min(this.page > 1 ? this.page * this.size : this.size, this.totalCount)
+  }
 }
 
-export default Pagination

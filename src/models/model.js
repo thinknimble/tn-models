@@ -39,7 +39,7 @@ export default class Model {
   // Gather read-only fields
   static getReadOnlyFields() {
     //
-    const legacyReadOnlyFields = this.readOnlyFields
+    const legacyReadOnlyFields = this.readOnlyFields ? this.readOnlyFields : []
 
     //
     let readOnlyFields = []
@@ -86,14 +86,14 @@ export default class Model {
         data[field] = obj[field]
       })
     } else {
-      data = obj
+      data = { ...obj }
     }
 
+    // Delete private '_fields' member
+    delete data['_fields'];
+
     // Remove read only and excluded fields
-    [
-      ...this.getReadOnlyFields(),
-      ...excludeFields
-    ].forEach(item => { delete data[item] })
+    [...this.getReadOnlyFields(), ...excludeFields].forEach(item => { delete data[item] })
 
     return objectToSnakeCase(data)
   }

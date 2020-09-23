@@ -86,13 +86,13 @@ export class ArrayField extends Field {
     if (!type) {
       throw Error('`type` is a required parameter for ArrayField')
     }
-    super({ defaultVal })
+    super({ defaultVal, readOnly })
     Object.assign(this, { type })
   }
 
   clean(value) {
     return notNullOrUndefined(value) && isArray(value)
-      ? value.map(i => type.clean(i))
+      ? value.map(i => this.type.clean(i))
       : this.getDefaultVal()
   }
 }
@@ -110,7 +110,7 @@ export class ModelField extends Field {
     if (!ModelClass) {
       throw Error('ModelClass is a required parameter for ModelField')
     }
-    super({ defaultVal })
+    super({ defaultVal, readOnly })
     Object.assign(this, { ModelClass, many })
   }
 

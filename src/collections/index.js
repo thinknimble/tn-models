@@ -1,7 +1,7 @@
 import CollectionManager from './collectionManager'
-import pagination from './pagination'
+import Pagination from './pagination'
 
 export {
   CollectionManager,
-  pagination,
+  Pagination,
 }

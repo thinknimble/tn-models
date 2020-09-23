@@ -38,12 +38,12 @@ export default class CollectionManager {
    */
   update(data, append = false) {
     this.list = [...(append ? this.list : []), ...data.results]
-    this.pagination = {
+    this.pagination = Pagination.create({
       ...this.pagination,
       next: data.next,
       previous: data.previous,
       totalCount: data.count,
-    }
+    })
     return this
   }
 
@@ -73,10 +73,10 @@ export default class CollectionManager {
     }
 
     this.loadingNextPage = true
-    this.pagination = {
+    this.pagination = Pagination.create({
       ...this.pagination,
       page: this.pagination.page + 1,
-    }
+    })
 
     try {
       const response = await this.ModelClass.api.list({
