@@ -7,15 +7,24 @@ const PaginationDefaults = {
 }
 
 export default class Pagination {
-  constructor(opts) {
-    Object.assign(this, PaginationDefaults, opts)
+
+  constructor(opts = {}) {
+    Object.assign(this, PaginationDefaults, { ...opts })
   }
 
-  static create(opts = {}) {
+  create(opts = {}) {
     return new Pagination(opts)
   }
 
-  static calcTotalPages(pagination) {
+  copy() {
+    return Pagination.create(this)
+  }
+
+  update(data = {}) {
+    return Object.assign(this.copy(), data)
+  }
+
+  calcTotalPages(pagination) {
     const { totalCount, size } = pagination
     if (!totalCount) {
       return null
@@ -24,30 +33,21 @@ export default class Pagination {
   }
 
   setNextPage() {
-    if (!this.hasNextPage) return
+    if (this.page === this.calcTotalPages) return
     this.page++
   }
 
   setPrevPage() {
-    if (!this.hasPrevPage) return
+    if (this.page === 1) return
     this.page--
   }
-
-  get totalPages() {
-    const { totalCount, size } = this
-    if (!totalCount) {
-      return null
-    }
-    return Math.ceil(totalCount / size)
-  }
-
 
   get hasPrevPage() {
     return this.page > 1
   }
 
   get hasNextPage() {
-    return this.totalPages && this.page !== this.totalPages
+    return this.calcTotalPages(this) && this.page !== this.calcTotalPages(this)
   }
 
   get currentPageStart() {
@@ -58,4 +58,3 @@ export default class Pagination {
     return Math.min(this.page > 1 ? this.page * this.size : this.size, this.totalCount)
   }
 }
-

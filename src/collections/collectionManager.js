@@ -64,6 +64,22 @@ export default class CollectionManager {
   }
 
   /**
+   * Advance to the next page and refresh the collection.
+   */
+  nextPage() {
+    this.pagination.setNextPage()
+    return this.refresh()
+  }
+
+  /**
+   * Go back to the previous page and refresh the collection.
+   */
+  prevPage() {
+    this.pagination.setPrevPage()
+    return this.refresh()
+  }
+
+  /**
    * Get the next page for a collection and add this page
    * to the collection.
    */
