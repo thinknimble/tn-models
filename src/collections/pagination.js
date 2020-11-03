@@ -12,7 +12,7 @@ export default class Pagination {
     Object.assign(this, PaginationDefaults, { ...opts })
   }
 
-  create(opts = {}) {
+  static create(opts = {}) {
     return new Pagination(opts)
   }
 
