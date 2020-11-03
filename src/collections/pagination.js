@@ -8,12 +8,16 @@ const PaginationDefaults = {
 
 export default class Pagination {
 
+  constructor(opts = {}) {
+    Object.assign(this, PaginationDefaults, { ...opts })
+  }
+
   create(opts = {}) {
-    return Object.assign(Object.create(Pagination), PaginationDefaults, { ...opts })
+    return new Pagination(opts)
   }
 
   copy() {
-    return Object.assign(Object.create(Pagination), PaginationDefaults, this)
+    return Pagination.create(this)
   }
 
   update(data = {}) {
