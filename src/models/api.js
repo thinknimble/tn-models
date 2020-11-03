@@ -70,7 +70,7 @@ export default class ModelAPI {
 
   create(obj, fields = [], excludeFields = []) {
     const url = this.constructor.ENDPOINT
-    const data = this.cls.toAPI(obj)
+    const data = this.cls.toAPI(obj, fields, excludeFields)
     const options = {}
 
     return this.client
