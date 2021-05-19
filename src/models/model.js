@@ -6,6 +6,7 @@
  * @author  William Huster <william@thinknimble.com>
  */
 import { notUndefined } from '../validation'
+import { CollectionManager } from '../collections'
 
 import { objectToCamelCase, objectToSnakeCase } from '@thinknimble/tn-utils'
 
@@ -96,5 +97,17 @@ export default class Model {
     [...this.getReadOnlyFields(), ...excludeFields].forEach(item => { delete data[item] })
 
     return objectToSnakeCase(data)
+  }
+
+  /**
+   * Create a Collection for current ModelClass.
+   * @param {Object} opts collection options, such as filters.
+   * @returns {CollectionManager}
+   */
+  static createCollection(opts) {
+    return CollectionManager.create({
+      ...opts,
+      ModelClass: this.constructor,
+    })
   }
 }
