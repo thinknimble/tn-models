@@ -107,7 +107,7 @@ export default class Model {
   static createCollection(opts) {
     return CollectionManager.create({
       ...opts,
-      ModelClass: this.constructor,
+      ModelClass: this,
     })
   }
 }
