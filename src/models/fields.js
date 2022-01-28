@@ -4,13 +4,13 @@
  *
  * @author  William Huster <william@thinknimble.com>
  */
-import { random } from "@thinknimble/tn-utils";
+import { random } from '@thinknimble/tn-utils'
 
 import { notNullOrUndefined, isFunction, isArray } from '../validation'
 
 export class Field {
   constructor({ defaultVal = null, readOnly = false } = {}) {
-    Object.assign(this, { defaultVal, readOnly });
+    Object.assign(this, { defaultVal, readOnly })
   }
 
   /**
@@ -24,24 +24,20 @@ export class Field {
   }
 
   getDefaultVal() {
-    return isFunction(this.defaultVal)
-      ? this.defaultVal()
-      : this.defaultVal
+    return isFunction(this.defaultVal) ? this.defaultVal() : this.defaultVal
   }
 }
 
 export class BooleanField extends Field {
   constructor(opts) {
     super({
+      defaultVal: false,
       ...opts,
-      defaultVal: false
-    });
+    })
   }
 
   clean(value) {
-    return notNullOrUndefined(value)
-      ? Boolean(value)
-      : this.getDefaultVal()
+    return notNullOrUndefined(value) ? Boolean(value) : this.getDefaultVal()
   }
 }
 
@@ -49,14 +45,12 @@ export class CharField extends Field {
   constructor(opts) {
     super({
       ...opts,
-      defaultVal: ''
-    });
+      defaultVal: '',
+    })
   }
 
   clean(value) {
-    return notNullOrUndefined(value)
-      ? String(value)
-      : this.getDefaultVal()
+    return notNullOrUndefined(value) ? String(value) : this.getDefaultVal()
   }
 }
 
@@ -65,24 +59,18 @@ export class IdField extends Field {
     super({
       ...opts,
       defaultVal: random.randomString,
-    });
+    })
   }
 }
 
 export class IntegerField extends Field {
   clean(value) {
-    return notNullOrUndefined(value)
-      ? Number(value)
-      : this.getDefaultVal()
+    return notNullOrUndefined(value) ? Number(value) : this.getDefaultVal()
   }
 }
 
 export class ArrayField extends Field {
-  constructor({
-    defaultVal = null,
-    readOnly = false,
-    type = null,
-  } = {}) {
+  constructor({ defaultVal = null, readOnly = false, type = null } = {}) {
     if (!type) {
       throw Error('`type` is a required parameter for ArrayField')
     }
@@ -92,7 +80,7 @@ export class ArrayField extends Field {
 
   clean(value) {
     return notNullOrUndefined(value) && isArray(value)
-      ? value.map(i => this.type.clean(i))
+      ? value.map((i) => this.type.clean(i))
       : this.getDefaultVal()
   }
 }
@@ -101,12 +89,7 @@ export class ArrayField extends Field {
  * Instantiate a nested model or list of nested models
  */
 export class ModelField extends Field {
-  constructor({
-    defaultVal = null,
-    readOnly = false,
-    ModelClass = null,
-    many = false,
-  } = {}) {
+  constructor({ defaultVal = null, readOnly = false, ModelClass = null, many = false } = {}) {
     if (!ModelClass) {
       throw Error('ModelClass is a required parameter for ModelField')
     }
@@ -120,7 +103,7 @@ export class ModelField extends Field {
       //    that hasn't been camelCased. This is kind of a hack, but is
       //    _relatively_ harmless.
       return this.many
-        ? value.map(i => this.ModelClass.fromAPI(i))
+        ? value.map((i) => this.ModelClass.fromAPI(i))
         : this.ModelClass.fromAPI(value)
     }
     return this.getDefaultVal()
@@ -135,4 +118,4 @@ export default {
   IntegerField,
   ArrayField,
   ModelField,
-};
+}
