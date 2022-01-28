@@ -87,7 +87,7 @@ export default class Model {
       data = { ...obj }
     }
 
-    // Delete private '_fields' member
+    // Delete private '_fields' member`
     delete data['_fields']
 
     // Remove read only and excluded fields
