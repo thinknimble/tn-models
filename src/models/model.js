@@ -20,7 +20,7 @@ export default class Model {
 
     // Loop over fields and assign kwarg values to this instance
     for (const fieldName in this._fields) {
-      const field = this._fields[fieldName];
+      const field = this._fields[fieldName]
 
       this[fieldName] = field.clean(kwargs[fieldName])
     }
@@ -50,10 +50,7 @@ export default class Model {
       }
     }
 
-    return [
-      ...legacyReadOnlyFields,
-      ...readOnlyFields,
-    ]
+    return [...legacyReadOnlyFields, ...readOnlyFields]
   }
 
   /**
@@ -83,7 +80,7 @@ export default class Model {
 
     // If it's a partial update, get only the fields specified
     if (fields.length > 0) {
-      fields.forEach(field => {
+      fields.forEach((field) => {
         data[field] = obj[field]
       })
     } else {
@@ -91,10 +88,26 @@ export default class Model {
     }
 
     // Delete private '_fields' member
-    delete data['_fields'];
+    delete data['_fields']
 
     // Remove read only and excluded fields
-    [...this.getReadOnlyFields(), ...excludeFields].forEach(item => { delete data[item] })
+    ;[...this.getReadOnlyFields(), ...excludeFields].forEach((item) => {
+      delete data[item]
+    })
+    Object.keys(data).forEach((k) => {
+      if (
+        data[k] instanceof Model ||
+        (Array.isArray(data[k]) && data[k].length && data[k][0] instanceof Model)
+      ) {
+        if (Array.isArray(data[k])) {
+          data[k] = data[k].map((value) => {
+            return value.constructor.toAPI(value)
+          })
+        } else data[k] = data[k].constructor.toAPI(data[k])
+      } else {
+        data[k] = data[k]
+      }
+    })
 
     return objectToSnakeCase(data)
   }

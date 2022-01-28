@@ -5,7 +5,8 @@ import ModelAPI from '../src/models'
 
 // Create classes for tests. This serves as a smoke test
 // for the basic syntax.
-class MockApiClient { }
+
+class MockApiClient {}
 
 class PersonAPI extends ModelAPI {
   static client = new MockApiClient()
@@ -16,7 +17,7 @@ class Person extends Model {
   // static api = PersonAPI.create(Person)
 
   // fields
-  static id = new fields.IdField()
+  static id = new fields.IdField({ readOnly: true })
   static firstName = new fields.CharField()
   static lastName = new fields.CharField()
   static bestFriend = new fields.ModelField({ ModelClass: Person })
@@ -33,7 +34,6 @@ describe('Model', function () {
       assert.equal(person._fields['firstName'], Person.firstName)
       assert.equal(person._fields['lastName'], Person.lastName)
     })
-
 
     it('should have keys for each static property without any args', function () {
       const person = new Person()
@@ -117,13 +117,16 @@ describe('Model', function () {
       assert.notEqual(JSON.stringify(person), JSON.stringify(args))
 
       // Field names should now be camelCased
-      assert.equal(JSON.stringify(person), JSON.stringify({
-        id: '12345',
-        firstName: 'William',
-        lastName: 'Hackerman',
-        bestFriend: null,
-        allFriends: null
-      }))
+      assert.equal(
+        JSON.stringify(person),
+        JSON.stringify({
+          id: '12345',
+          firstName: 'William',
+          lastName: 'Hackerman',
+          bestFriend: null,
+          allFriends: null,
+        }),
+      )
     })
 
     it('should create nested Person models for friends data', function () {
@@ -134,21 +137,21 @@ describe('Model', function () {
         best_friend: {
           id: '11111',
           first_name: 'Barack',
-          last_name: 'Obama'
+          last_name: 'Obama',
         },
         all_friends: null,
         all_friends: [
           {
             id: '11111',
             first_name: 'Barack',
-            last_name: 'Obama'
+            last_name: 'Obama',
           },
         ],
       }
       const person = Person.fromAPI(args)
       delete person._fields
       delete person.bestFriend._fields
-      person.allFriends.forEach(f => delete f._fields)
+      person.allFriends.forEach((f) => delete f._fields)
 
       // One for each model field, plus a private '_fields' prop
       assert.equal(Object.keys(person).length, 5)
@@ -157,28 +160,30 @@ describe('Model', function () {
       assert.notEqual(JSON.stringify(person), JSON.stringify(args))
 
       // Field names should now be camelCased
-      assert.equal(JSON.stringify(person), JSON.stringify({
-        id: '12345',
-        firstName: 'William',
-        lastName: 'Hackerman',
-        bestFriend: {
-          id: '11111',
-          firstName: 'Barack',
-          lastName: 'Obama',
-          bestFriend: null,
-          allFriends: null,
-        },
-        allFriends: [
-          {
+      assert.equal(
+        JSON.stringify(person),
+        JSON.stringify({
+          id: '12345',
+          firstName: 'William',
+          lastName: 'Hackerman',
+          bestFriend: {
             id: '11111',
             firstName: 'Barack',
             lastName: 'Obama',
             bestFriend: null,
             allFriends: null,
-          }
-        ]
-      }))
+          },
+          allFriends: [
+            {
+              id: '11111',
+              firstName: 'Barack',
+              lastName: 'Obama',
+              bestFriend: null,
+              allFriends: null,
+            },
+          ],
+        }),
+      )
     })
   })
 })
-
