@@ -1,6 +1,6 @@
 {
   "name": "@thinknimble/tn-models",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Utilities for building front-end models.",
   "author": "William Huster <william@thinknimble.com>",
   "license": "SEE LICENSE IN LICENSE.TXT",
