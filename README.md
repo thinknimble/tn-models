@@ -362,8 +362,8 @@ All field types extend the base Field class, they inherit the methods clean(valu
 new CharField()
 </code>
 </td>
-<td>defaultVal, readOnly</td>
-<td>creates a new char field, properties are optional ( defaults: null, false)</td>
+<td>readOnly</td>
+<td>creates a new char field, properties are optional ( defaults: false)</td>
 
 </tr>
 <tr>
