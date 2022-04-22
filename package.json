@@ -3,7 +3,7 @@
   "version": "1.2.1",
   "description": "Utilities for building front-end models.",
   "author": "William Huster <william@thinknimble.com>",
-  "license": "SEE LICENSE IN LICENSE.TXT",
+  "license": "MIT",
   "main": "lib/index.js",
   "scripts": {
     "compile": "babel src -d lib",
@@ -16,12 +16,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://bitbucket.org/thinknimble/tn-models.git"
+    "url": "git+https://github.com/thinknimble/tn-models"
   },
   "keywords": [
     "javascript"
   ],
-  "homepage": "https://bitbucket.org/thinknimble/tn-models#readme",
+  "homepage": "https://github.com/thinknimble/tn-models",
   "dependencies": {
     "@thinknimble/tn-utils": "^1.4.0"
   },
