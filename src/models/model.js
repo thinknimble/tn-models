@@ -5,12 +5,12 @@
  *
  * @author  William Huster <william@thinknimble.com>
  */
-import { notUndefined } from '../validation'
+import { notUndefined, notNullOrUndefined } from '../validation'
 import { CollectionManager } from '../collections'
 
 import { objectToCamelCase, objectToSnakeCase } from '@thinknimble/tn-utils'
 
-import { Field } from './fields'
+import { Field, ModelField } from './fields'
 
 export default class Model {
   constructor(kwargs = {}) {
@@ -20,7 +20,7 @@ export default class Model {
 
     // Loop over fields and assign kwarg values to this instance
     for (const fieldName in this._fields) {
-      const field = this._fields[fieldName];
+      const field = this._fields[fieldName]
 
       this[fieldName] = field.clean(kwargs[fieldName])
     }
@@ -50,10 +50,7 @@ export default class Model {
       }
     }
 
-    return [
-      ...legacyReadOnlyFields,
-      ...readOnlyFields,
-    ]
+    return [...legacyReadOnlyFields, ...readOnlyFields]
   }
 
   /**
@@ -83,7 +80,7 @@ export default class Model {
 
     // If it's a partial update, get only the fields specified
     if (fields.length > 0) {
-      fields.forEach(field => {
+      fields.forEach((field) => {
         data[field] = obj[field]
       })
     } else {
@@ -91,12 +88,71 @@ export default class Model {
     }
 
     // Delete private '_fields' member
-    delete data['_fields'];
-
+    delete data['_fields']
+    // format it the way it is expected
+    Object.keys(data).forEach((k) => {
+      if (
+        data[k] instanceof Model ||
+        (Array.isArray(data[k]) && data[k].length && data[k][0] instanceof Model)
+      ) {
+        if (Array.isArray(data[k])) {
+          data[k] = data[k].map((value) => value.constructor.toAPI(value))
+        } else data[k] = data[k].constructor.toAPI(data[k])
+      }
+    })
     // Remove read only and excluded fields
-    [...this.getReadOnlyFields(), ...excludeFields].forEach(item => { delete data[item] })
-
+    ;[...this.getReadOnlyFields(), ...excludeFields].forEach((item) => {
+      delete data[item]
+    })
     return objectToSnakeCase(data)
+  }
+  /* 
+  duplicate() {
+    const data = {}
+    Object.keys(data).forEach((k) => {
+      if (k == 'id') {
+        deepCopy['id'] = random.randomString()
+      }
+      if (
+        data[k] instanceof Model ||
+        (Array.isArray(data[k]) && data[k].length && data[k][0] instanceof Model)
+      ) {
+        if (Array.isArray(data[k])) {
+          deepCopy[k] = data[k].map((value) => value.constructor.copyEntity(value))
+        } else deepCopy[k] = data[k].constructor.copyEntity(data[k])
+      }
+    })
+
+    return deepCopy
+  } */
+  newCopy() {
+    const fields = {}
+    const modelFields = {}
+
+    for (const prop in this) {
+      if (
+        prop !== '_fields' &&
+        this._fields[prop] &&
+        !this._fields[prop].unique &&
+        notNullOrUndefined(this[prop])
+      ) {
+        if (this._fields[prop] instanceof ModelField) {
+          if (Array.isArray(this._fields[prop])) {
+            modelFields[prop] = this[prop].map((field) => field.newCopy())
+          } else {
+            modelFields[prop] = this[prop].newCopy()
+          }
+        } else {
+          fields[prop] = this[prop]
+        }
+      }
+    }
+    let copy = new this.constructor(fields)
+    Object.entries(modelFields).forEach(([key, val]) => {
+      copy[key] = val
+    })
+
+    return copy
   }
 
   /**

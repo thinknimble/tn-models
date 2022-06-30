@@ -242,4 +242,46 @@ describe('Model', function () {
       assert.equal(true, person1.isGlam)
     })
   })
+  describe('#newCopy', function () {
+    class PersonLastUnique extends Person {
+      static lastName = new fields.CharField({ unique: true })
+      static bestFriend = new fields.ModelField({ ModelClass: PersonLastUnique })
+    }
+    const testPersonDict = {
+      first_name: 'newfirst',
+      last_name: 'newlast',
+      best_friend: null,
+      all_friends: null,
+      is_cool: false,
+    }
+    const testPersonDict1 = {
+      first_name: 'newfirst1',
+      last_name: 'newlast1',
+      best_friend: null,
+      all_friends: null,
+      is_cool: false,
+    }
+    const testPersonDict2 = {
+      first_name: 'newfirst2',
+      last_name: 'newlast2',
+      best_friend: null,
+      all_friends: null,
+      is_cool: false,
+    }
+    it('should create a new copy of the entity with new values for any unique fields (id is unique by default)', () => {
+      const person = new Person(testPersonDict)
+      const newCopyOfPerson = person.newCopy()
+      assert.notEqual(person.id, newCopyOfPerson.id)
+    })
+    it('should create a new copy of the entity with new value for lastname that is set to unique', () => {
+      const person = PersonLastUnique.fromAPI(testPersonDict1)
+      const newCopyOfPerson = person.newCopy()
+      assert.notEqual(person.lastName, newCopyOfPerson.lastName)
+    })
+    it('should create a new copy of the entity with new value for lastname of parent and nested models that is set to unique', () => {
+      const person = PersonLastUnique.fromAPI({ ...testPersonDict, best_friend: testPersonDict1 })
+      const copyPerson = person.newCopy()
+      assert.notEqual(person.bestFriend.lastName, copyPerson.bestFriend.lastName)
+    })
+  })
 })

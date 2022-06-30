@@ -9,8 +9,8 @@ import { random } from '@thinknimble/tn-utils'
 import { notNullOrUndefined, isFunction, isArray } from '../validation'
 
 export class Field {
-  constructor({ defaultVal = null, readOnly = false } = {}) {
-    Object.assign(this, { defaultVal, readOnly })
+  constructor({ defaultVal = null, readOnly = false, unique = false } = {}) {
+    Object.assign(this, { defaultVal, readOnly, unique })
   }
 
   /**
@@ -57,6 +57,7 @@ export class CharField extends Field {
 export class IdField extends Field {
   constructor(opts) {
     super({
+      unique: true,
       ...opts,
       defaultVal: random.randomString,
     })
