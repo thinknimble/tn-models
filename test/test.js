@@ -242,7 +242,7 @@ describe('Model', function () {
       assert.equal(true, person1.isGlam)
     })
   })
-  describe('#newCopy', function () {
+  describe('#newCopy & #dpulicate', function () {
     class PersonLastUnique extends Person {
       static lastName = new fields.CharField({ unique: true })
       static bestFriend = new fields.ModelField({ ModelClass: PersonLastUnique })
@@ -269,7 +269,7 @@ describe('Model', function () {
       is_cool: false,
     }
     it('should create a new copy of the entity with new values for any unique fields (id is unique by default)', () => {
-      const person = new Person(testPersonDict)
+      const person = Person.fromAPI(testPersonDict)
       const newCopyOfPerson = person.newCopy()
       assert.notEqual(person.id, newCopyOfPerson.id)
     })
@@ -282,6 +282,51 @@ describe('Model', function () {
       const person = PersonLastUnique.fromAPI({ ...testPersonDict, best_friend: testPersonDict1 })
       const copyPerson = person.newCopy()
       assert.notEqual(person.bestFriend.lastName, copyPerson.bestFriend.lastName)
+    })
+    it('should create an exact replica of the entity', () => {
+      const person = Person.fromAPI(testPersonDict)
+      const spreadPerson = person.duplicate()
+      assert.equal(person.firstName, spreadPerson.firstName)
+    })
+    it('should have replica with a different object in memory', () => {
+      const person = Person.fromAPI(testPersonDict)
+      const spreadPerson = person.duplicate()
+      person.firstName = 'test'
+      assert.notEqual(person.firstName, spreadPerson.firstName)
+    })
+    it('should have replica with the same object in memory', () => {
+      const person = Person.fromAPI(testPersonDict)
+      const spreadPerson = person
+      person.firstName = 'test'
+      assert.equal(person.firstName, spreadPerson.firstName)
+    })
+    it('should be able to apply copy logic to 100 new instances', () => {
+      const person = Person.fromAPI(testPersonDict)
+      let count = 0
+
+      let people = []
+      while (count <= 99) {
+        // create 100 new persons
+        people.push(person.newCopy())
+        count++
+      }
+      for (let i = people.length - 1; i >= 0; i--) {
+        if (i == 0) {
+          person.bestFriend = people[0]
+        } else {
+          people[i - 1].bestFriend = people[i]
+        }
+      }
+      let iterations = 0
+      let friend = null
+      while (iterations <= people.length) {
+        if (iterations == 0) {
+          friend = person.bestFriend
+        } else {
+          friend = friend.bestFriend
+        }
+        iterations++
+      }
     })
   })
 })

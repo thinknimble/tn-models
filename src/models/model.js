@@ -106,25 +106,31 @@ export default class Model {
     })
     return objectToSnakeCase(data)
   }
-  /* 
+
   duplicate() {
-    const data = {}
-    Object.keys(data).forEach((k) => {
-      if (k == 'id') {
-        deepCopy['id'] = random.randomString()
+    const fields = {}
+    const modelFields = {}
+
+    for (const prop in this) {
+      if (prop !== '_fields' && this._fields[prop]) {
+        if (this._fields[prop] instanceof ModelField && notNullOrUndefined(this[prop])) {
+          if (Array.isArray(this._fields[prop])) {
+            modelFields[prop] = this[prop].map((field) => field.duplicate())
+          } else {
+            modelFields[prop] = this[prop].duplicate()
+          }
+        } else {
+          fields[prop] = this[prop]
+        }
       }
-      if (
-        data[k] instanceof Model ||
-        (Array.isArray(data[k]) && data[k].length && data[k][0] instanceof Model)
-      ) {
-        if (Array.isArray(data[k])) {
-          deepCopy[k] = data[k].map((value) => value.constructor.copyEntity(value))
-        } else deepCopy[k] = data[k].constructor.copyEntity(data[k])
-      }
+    }
+    let copy = new this.constructor(fields)
+    Object.entries(modelFields).forEach(([key, val]) => {
+      copy[key] = val
     })
 
-    return deepCopy
-  } */
+    return copy
+  }
   newCopy() {
     const fields = {}
     const modelFields = {}
