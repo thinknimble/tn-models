@@ -95,13 +95,14 @@ export default class Model {
         data[k] instanceof Model ||
         (Array.isArray(data[k]) && data[k].length && data[k][0] instanceof Model)
       ) {
-        if (Array.isArray(data[k])) {
-          data[k] = data[k].map((value) => value.constructor.toAPI(value))
-        } else data[k] = data[k].constructor.toAPI(data[k])
+        data[k] = Array.isArray(data[k])
+          ? data[k].map((value) => value.constructor.toAPI(value))
+          : (data[k] = data[k].constructor.toAPI(data[k]))
       }
     })
     // Remove read only and excluded fields
-    ;[...this.getReadOnlyFields(), ...excludeFields].forEach((item) => {
+    let mergedFields = [...this.getReadOnlyFields(), ...excludeFields]
+    mergedFields.forEach((item) => {
       delete data[item]
     })
     return objectToSnakeCase(data)
