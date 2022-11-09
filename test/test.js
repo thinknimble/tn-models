@@ -1,3 +1,4 @@
+import { objectToSnakeCase, toSnakeCase } from '@thinknimble/tn-utils'
 import assert from 'assert'
 
 import Model, { fields } from '../src/models'
@@ -242,10 +243,11 @@ describe('Model', function () {
       assert.equal(true, person1.isGlam)
     })
   })
-  describe('#newCopy & #dpulicate', function () {
+  describe('#newCopy & #duplicate', function () {
     class PersonLastUnique extends Person {
       static lastName = new fields.CharField({ unique: true })
       static bestFriend = new fields.ModelField({ ModelClass: PersonLastUnique })
+      static allFriends = new fields.ModelField({ ModelClass: PersonLastUnique, many: true })
     }
     const testPersonDict = {
       first_name: 'newfirst',
@@ -261,11 +263,12 @@ describe('Model', function () {
       all_friends: null,
       is_cool: false,
     }
-    const testPersonDict2 = {
+
+    const testPersonFS = {
       first_name: 'newfirst2',
       last_name: 'newlast2',
       best_friend: null,
-      all_friends: null,
+      all_friends: [testPersonDict1],
       is_cool: false,
     }
     it('should create a new copy of the entity with new values for any unique fields (id is unique by default)', () => {
@@ -283,16 +286,34 @@ describe('Model', function () {
       const copyPerson = person.newCopy()
       assert.notEqual(person.bestFriend.lastName, copyPerson.bestFriend.lastName)
     })
+    it('should create a new copy of the entity with new value for lastname of parent and nested models that is set to unique', () => {
+      const person = PersonLastUnique.fromAPI({ ...testPersonFS })
+      const copyPerson = person.newCopy()
+      assert.notEqual(person.allFriends[0].lastName, copyPerson.allFriends[0].lastName)
+    })
     it('should create an exact replica of the entity', () => {
       const person = Person.fromAPI(testPersonDict)
       const spreadPerson = person.duplicate()
       assert.equal(person.firstName, spreadPerson.firstName)
     })
+    it('should create an exact replica of the entity with a model array', () => {
+      const person = Person.fromAPI(testPersonFS)
+      const spreadPerson = person.duplicate()
+      assert.equal(person.allFriends[0].lastName, spreadPerson.allFriends[0].lastName)
+    })
+
     it('should have replica with a different object in memory', () => {
       const person = Person.fromAPI(testPersonDict)
       const spreadPerson = person.duplicate()
       person.firstName = 'test'
       assert.notEqual(person.firstName, spreadPerson.firstName)
+    })
+
+    it('should create an exact replica of the entity with a model array', () => {
+      const person = Person.fromAPI(testPersonFS)
+      const spreadPerson = person.duplicate()
+      person.allFriends[0].lastName = 'test'
+      assert.notEqual(person.allFriends[0].lastName, spreadPerson.allFriends[0].lastName)
     })
     it('should have replica with the same object in memory', () => {
       const person = Person.fromAPI(testPersonDict)
@@ -327,6 +348,102 @@ describe('Model', function () {
         }
         iterations++
       }
+    })
+  })
+  describe('#toDict', function () {
+    const testPersonDict1 = {
+      first_name: 'newfirst',
+      last_name: 'newlast',
+      best_friend: null,
+      all_friends: null,
+      is_cool: false,
+      is_hawt: true,
+      is_glam: true,
+    }
+    const testPersonDict2 = {
+      first_name: 'newfirst1',
+      last_name: 'newlast',
+      best_friend: null,
+      all_friends: null,
+      is_cool: false,
+      is_hawt: true,
+      is_glam: true,
+    }
+    const testPersonDict3 = {
+      first_name: 'newfirst',
+      last_name: 'newlast',
+      best_friend: testPersonDict1,
+      all_friends: null,
+      is_cool: false,
+      is_hawt: true,
+      is_glam: true,
+    }
+    const testPersonDict4 = {
+      first_name: 'newfirst',
+      last_name: 'newlast',
+      best_friend: null,
+      all_friends: [testPersonDict2],
+      is_cool: false,
+      is_hawt: true,
+      is_glam: true,
+    }
+    const testPersonDict = {
+      first_name: 'newfirst',
+      last_name: 'newlast',
+      best_friend: null,
+      all_friends: null,
+      is_cool: false,
+      is_hawt: true,
+      is_glam: true,
+    }
+
+    it('# should return a dictionary representation of a model', () => {
+      const person = Person.fromAPI(testPersonDict)
+      const personDict = person.toDict()
+
+      Object.entries(personDict).forEach(([k, v]) => {
+        if (Object.keys(testPersonDict).includes(toSnakeCase(k))) {
+          assert.equal(testPersonDict[toSnakeCase(k)], v)
+        }
+      })
+    })
+    it('# should return a dictionary representation of a model including the model field', () => {
+      const person = Person.fromAPI(testPersonDict3)
+      const personDict = person.toDict()
+
+      Object.entries(personDict).forEach(([k, v]) => {
+        if (Object.keys(testPersonDict3).includes(toSnakeCase(k))) {
+          if (k != 'bestFriend') {
+            assert.equal(testPersonDict3[toSnakeCase(k)], v)
+          } else {
+            Object.entries(personDict['bestFriend']).forEach(([bk, bv]) => {
+              if (Object.keys(testPersonDict3['best_friend']).includes(toSnakeCase(bk))) {
+                assert.equal(testPersonDict3['best_friend'][toSnakeCase(bk)], bv)
+              }
+            })
+          }
+        }
+      })
+    })
+    it('# should return a dictionary representation of a model including the model ARRAY field', () => {
+      const person = Person.fromAPI(testPersonDict4)
+      const personDict = person.toDict()
+
+      Object.entries(personDict).forEach(([k, v]) => {
+        if (Object.keys(testPersonDict4).includes(toSnakeCase(k))) {
+          if (k != 'allFriends') {
+            assert.equal(testPersonDict4[toSnakeCase(k)], v)
+          } else {
+            personDict['allFriends'].forEach((friend, i) => {
+              Object.entries(friend).forEach(([k, v]) => {
+                if (Object.keys(testPersonDict4['all_friends'][i]).includes(toSnakeCase(k))) {
+                  assert.equal(testPersonDict4['all_friends'][i][toSnakeCase(k)], v)
+                }
+              })
+            })
+          }
+        }
+      })
     })
   })
 })
