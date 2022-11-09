@@ -407,7 +407,7 @@ describe('Model', function () {
         }
       })
     })
-    it('# should return a dictionary representation of a model including th model field', () => {
+    it('# should return a dictionary representation of a model including the model field', () => {
       const person = Person.fromAPI(testPersonDict3)
       const personDict = person.toDict()
 
@@ -425,7 +425,7 @@ describe('Model', function () {
         }
       })
     })
-    it('# should return a dictionary representation of a model including th model ARRAY field', () => {
+    it('# should return a dictionary representation of a model including the model ARRAY field', () => {
       const person = Person.fromAPI(testPersonDict4)
       const personDict = person.toDict()
 
