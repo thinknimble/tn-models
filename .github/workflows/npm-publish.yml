@@ -5,6 +5,11 @@ name: Node.js Package
 
 on:
   workflow_dispatch:
+    inputs:
+      package_version:
+        description: "Enter a new version"
+        required: true
+        type: "string"
     secrets:
       NPM_PUBLISH_TOKEN:
         required: true
@@ -30,7 +35,8 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - run: npm ci
-      - run: npm prepublish
+      - run: npm run prepublish
+      - run: npm version ${{ inputs.package_version }}
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_PUBLISH_TOKEN}}
