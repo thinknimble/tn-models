@@ -115,7 +115,7 @@ export default class Model {
     for (const prop in this) {
       if (prop !== '_fields' && this._fields[prop]) {
         if (this._fields[prop] instanceof ModelField && notNullOrUndefined(this[prop])) {
-          if (Array.isArray(this._fields[prop])) {
+          if (Array.isArray(this[prop]) || this._fields[prop].many) {
             modelFields[prop] = this[prop].map((field) => field.duplicate())
           } else {
             modelFields[prop] = this[prop].duplicate()
@@ -144,7 +144,7 @@ export default class Model {
         notNullOrUndefined(this[prop])
       ) {
         if (this._fields[prop] instanceof ModelField) {
-          if (Array.isArray(this._fields[prop])) {
+          if (Array.isArray(this[prop]) || this._fields[prop].many) {
             modelFields[prop] = this[prop].map((field) => field.newCopy())
           } else {
             modelFields[prop] = this[prop].newCopy()
@@ -160,6 +160,24 @@ export default class Model {
     })
 
     return copy
+  }
+
+  toDict() {
+    const returnFields = {}
+    for (const prop in this) {
+      if (prop !== '_fields' && this._fields[prop]) {
+        if (this._fields[prop] instanceof ModelField && notNullOrUndefined(this[prop])) {
+          if (Array.isArray(this[prop]) || this._fields[prop].many) {
+            returnFields[prop] = this[prop].map((field) => field.toDict())
+          } else {
+            returnFields[prop] = this[prop].toDict()
+          }
+        } else {
+          returnFields[prop] = this[prop]
+        }
+      }
+    }
+    return returnFields
   }
 
   /**
