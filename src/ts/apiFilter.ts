@@ -1,9 +1,19 @@
 import { isNotNull, isDefined, isNotEmpty, isDefinedAndNotNull, isNotBlank } from './validators'
+
+export interface IApiFilterKwargs {
+  key?: string | null
+  validators?: any[]
+  extractor?: (i: any) => {}
+}
 export interface IApiFilter {
+  key?: string | null
+  validators?: any[]
+  extractor?: (i: any) => {}
+
   isValid(value: any): boolean
 }
-export class ApiFilter implements IApiFilter {
-  key: string
+export default class ApiFilter implements IApiFilter {
+  key: string | null
   validators: any[]
   extractor: (i: any) => {}
   static validators = {
@@ -12,15 +22,25 @@ export class ApiFilter implements IApiFilter {
     isNotEmpty,
     isDefinedAndNotNull,
   }
-  constructor(key, validators = [isDefinedAndNotNull, isNotBlank], extractor = (i: any) => i) {
+  constructor(
+    key: string | null,
+    validators: any[] = [isDefinedAndNotNull, isNotBlank],
+    extractor = (i: any) => i,
+  ) {
     this.key = key
     this.validators = validators
     this.extractor = extractor
   }
-  static create({ key, validators, extractor }) {
+  static create(
+    {
+      key = null,
+      validators = [isDefinedAndNotNull, isNotBlank],
+      extractor = (i: any) => i,
+    }: IApiFilterKwargs = {} as IApiFilterKwargs,
+  ) {
     return new ApiFilter(key, validators, extractor)
   }
-  static buildParams(filtersMap: any, filters: any) {
+  static buildParams(filtersMap: any, filters: any): any {
     const result = {}
 
     Object.keys(filters).forEach((key) => {
