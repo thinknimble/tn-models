@@ -96,22 +96,7 @@ describe('CollectionManager', function () {
     assert.equal(Object.keys(collection.filters).length, 0)
   })
 })
-// describe('Model', () => {
-//   interface IPerson {
-//     firstName: CharField
-//     id: IdField
-//   }
-//   class Person extends Model<IPerson> {
-//     static id = new fields.Field()
-//     static firstName = new fields.Field()
-//   }
-//   type TPerson = ToValRepresentation<IPerson> & Person
-//   it('should create a model with the defined static fields', () => {
-//     let person = new Person() as TPerson
-//     assert.equal(Object.keys(person).includes('firstName'), true)
-//     assert.equal(Object.keys(person).includes('id'), true)
-//   })
-// })
+
 describe('Model', function () {
   type TPerson = ToValRepresentation<IPerson> & Person
   interface IPerson {
