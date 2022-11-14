@@ -11,6 +11,9 @@ class MockApiClient {}
 class PersonAPI extends ModelAPI {
   static client = new MockApiClient()
 }
+class ReadOnlyPerson extends Model {
+  static id = new fields.IdField({ readOnly: true })
+}
 
 class Person extends Model {
   //
@@ -36,6 +39,7 @@ describe('Model', function () {
       assert.equal(person._fields['id'], Person.id)
       assert.equal(person._fields['firstName'], Person.firstName)
       assert.equal(person._fields['lastName'], Person.lastName)
+      console.log(ReadOnlyPerson.getReadOnlyFields())
     })
 
     it('should have keys for each static property without any args', function () {
