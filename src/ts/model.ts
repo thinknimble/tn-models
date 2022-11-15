@@ -1,15 +1,14 @@
 import { isDefinedAndNotNull } from './validators'
-import { CollectionManager } from '../collections'
 import { objectToCamelCase, objectToSnakeCase } from '@thinknimble/tn-utils'
 import { TFields, Field, ModelField } from './fields'
 import { PickByValue } from './utility-types'
-import { ICollectionKwargs } from './collectionManager'
+import CollectionManager, { ICollectionKwargs } from './collectionManager'
 export type ToValRepresentation<T> = {
   [key in keyof T]: any
 }
 export type KeysToString<T> = keyof T
 
-export type PickModelFields<T> = PickByValue<T, Field>
+export type PickModelFields<T> = PickByValue<T, TFields>
 
 export default class Model<T = any> {
   #fields: PickModelFields<T>
@@ -39,7 +38,7 @@ export default class Model<T = any> {
     //
     //TODO: this type should be a list of strings of the object that are defined as readonly
     //
-    let readOnlyFields: KeysToString<PickModelFields<T>>[] = []
+    let readOnlyFields: string[] = []
     for (const [key, value] of Object.entries(this.getFields())) {
       if ((value as Field).readOnly === true) {
         readOnlyFields.push(key)

@@ -5,7 +5,8 @@ const PaginationDefaults = {
   previous: null,
   size: 25,
 }
-interface PaginationKwargs {
+export { PaginationDefaults }
+export interface PaginationKwargs {
   page: number
   totalCount: number
   next: null | string
@@ -37,7 +38,12 @@ export default class Pagination implements IPagination {
   previous: null | string
   size: number
   constructor(opts = {}) {
-    Object.assign(this, PaginationDefaults, { ...opts })
+    let options = { ...PaginationDefaults, ...opts }
+    this.page = options.page
+    this.totalCount = options.totalCount
+    this.next = options.next
+    this.previous = options.previous
+    this.size = options.size
   }
 
   static create(opts = {}) {

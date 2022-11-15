@@ -24,7 +24,9 @@ export class Field implements IField {
   unique: boolean
 
   constructor({ defaultVal = null, readOnly = false, unique = false } = {} as IFieldKwargs) {
-    Object.assign(this, { defaultVal, readOnly, unique })
+    this.defaultVal = defaultVal
+    this.readOnly = readOnly
+    this.unique = unique
   }
 
   /**
@@ -123,7 +125,8 @@ export class ModelField extends Field {
     }
 
     super({ defaultVal, readOnly, unique })
-    Object.assign(this, { ModelClass, many })
+    this.many = many
+    this.ModelClass = ModelClass
   }
 
   clean(value: any) {

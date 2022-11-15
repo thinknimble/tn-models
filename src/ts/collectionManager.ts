@@ -32,14 +32,19 @@ export default class CollectionManager {
     filters = {},
     ModelClass = null,
   } = {}) {
-    Object.assign(this, {
-      list,
-      pagination,
-      refreshing,
-      loadingNextPage,
-      filters,
-      ModelClass,
-    })
+    this.list = list
+    this.pagination = pagination
+    this.refreshing = refreshing
+    this.loadingNextPage = loadingNextPage
+    ;(this.filters = filters), (this.ModelClass = this.ModelClass)
+    // Object.assign(this, {
+    //   list,
+    //   pagination,
+    //   refreshing,
+    //   loadingNextPage,
+    //   filters,
+    //   ModelClass,
+    // })
   }
   static create(opts: ICollectionKwargs = {} as ICollectionKwargs) {
     if (Object.keys(opts)) {
