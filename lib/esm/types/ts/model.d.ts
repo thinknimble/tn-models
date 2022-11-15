@@ -14,7 +14,7 @@ export default class Model<T = any> {
     static create(opts?: {}): Model<any>;
     static fromAPI(json?: {}): Model<any>;
     static toAPI(obj: any, fields?: string[], excludeFields?: string[]): any;
-    static createCollection(opts: ICollectionKwargs): CollectionManager<unknown>;
+    static createCollection<T>(opts: ICollectionKwargs): CollectionManager<T>;
     duplicate(): any;
     newCopy(): any;
     toDict(): ToValRepresentation<T>;

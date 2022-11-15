@@ -87,8 +87,8 @@ export default class Model<T = any> {
     })
     return objectToSnakeCase(data)
   }
-  static createCollection(opts: ICollectionKwargs) {
-    return CollectionManager.create({
+  static createCollection<T>(opts: ICollectionKwargs) {
+    return CollectionManager.create<T>({
       ...opts,
       ModelClass: this,
     })
