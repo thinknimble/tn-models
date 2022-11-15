@@ -151,8 +151,8 @@ export default class Model<T = any> {
     return copy
   }
 
-  toDict() {
-    const returnFields = {}
+  toDict(): ToValRepresentation<T> {
+    const returnFields = {} as ToValRepresentation<T>
     for (const prop in this) {
       let propAsString = prop as string
       if (prop !== '#fields' && this.#fields[propAsString]) {
@@ -170,6 +170,6 @@ export default class Model<T = any> {
         }
       }
     }
-    return returnFields
+    return returnFields as ToValRepresentation<T>
   }
 }

@@ -14,8 +14,8 @@ export interface ICollectionManager {
     prevPage(): void;
     addNextPage(): void;
 }
-export default class CollectionManager {
-    list: any[];
+export default class CollectionManager<T> {
+    list: T[];
     pagination: IPagination;
     refreshing: boolean;
     loadingNextPage: boolean;
@@ -29,7 +29,7 @@ export default class CollectionManager {
         filters?: {} | undefined;
         ModelClass?: null | undefined;
     });
-    static create(opts?: ICollectionKwargs): CollectionManager;
+    static create<T>(opts?: ICollectionKwargs): CollectionManager<T>;
     update(data: any, append?: boolean): this;
     refresh(): Promise<this>;
     nextPage(): Promise<this>;

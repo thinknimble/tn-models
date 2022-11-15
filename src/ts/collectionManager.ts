@@ -17,8 +17,8 @@ export interface ICollectionManager {
   addNextPage(): void
 }
 
-export default class CollectionManager {
-  list: any[]
+export default class CollectionManager<T> {
+  list: T[]
   pagination: IPagination
   refreshing: boolean
   loadingNextPage: boolean
@@ -36,21 +36,14 @@ export default class CollectionManager {
     this.pagination = pagination
     this.refreshing = refreshing
     this.loadingNextPage = loadingNextPage
-    ;(this.filters = filters), (this.ModelClass = this.ModelClass)
-    // Object.assign(this, {
-    //   list,
-    //   pagination,
-    //   refreshing,
-    //   loadingNextPage,
-    //   filters,
-    //   ModelClass,
-    // })
+    this.filters = filters
+    this.ModelClass = ModelClass
   }
-  static create(opts: ICollectionKwargs = {} as ICollectionKwargs) {
+  static create<T>(opts: ICollectionKwargs = {} as ICollectionKwargs) {
     if (Object.keys(opts)) {
-      return new CollectionManager(opts as any)
+      return new CollectionManager<T>(opts as any)
     }
-    return new CollectionManager()
+    return new CollectionManager<T>()
   }
   update(data: any, append = false) {
     this.list = [...(append ? this.list : []), ...data.results]

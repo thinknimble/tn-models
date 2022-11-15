@@ -44,5 +44,6 @@ export {
   PaginationKwargs,
   IPagination,
   PickByValue,
+  fields
 }
 export default Model
