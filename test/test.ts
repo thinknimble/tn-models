@@ -14,6 +14,7 @@ import fields, {
   BooleanField,
 } from '../src/ts/fields'
 import { PickByValue } from '../src/ts/utility-types'
+import ApiFilter from '../src/ts/apiFilter'
 
 describe('Pagination', function () {
   it('Should create a pagination object with defaults', () => {
@@ -538,6 +539,48 @@ describe('Model', function () {
           }
         })
       })
+    })
+  })
+})
+describe('ApiFilter', () => {
+  describe('#constructor', () => {
+    it('should create a new filter using the new keyword', () => {
+      let apiFilter = new ApiFilter('test')
+      assert.equal(apiFilter.key, 'test')
+    })
+    it('should create a new filter using the create factory dn', () => {
+      let apiFilter1 = ApiFilter.create({ key: 'testing' })
+      assert.equal(apiFilter1.key, 'testing')
+    })
+    it('should build the filter params using the build fn', () => {
+      const filter_map = {
+        page: ApiFilter.create({ key: 'page' }),
+        pageSize: ApiFilter.create({ key: 'page_size' }),
+        name: ApiFilter.create({ key: 'name' }),
+      }
+      const filters = {
+        page: 1,
+        pageSize: 10,
+        name: 'test',
+      }
+      let apiFilterRes = ApiFilter.buildParams(filter_map, filters)
+      assert.equal(apiFilterRes.page, 1)
+      assert.equal(apiFilterRes.page_size, 10)
+      assert.equal(apiFilterRes.name, 'test')
+    })
+    it('should build the filter params using the build remove invalid', () => {
+      const filter_map = {
+        page: ApiFilter.create({ key: 'page' }),
+        pageSize: ApiFilter.create({ key: 'page_size' }),
+        name: ApiFilter.create({ key: 'name' }),
+      }
+      const filters = {
+        page: 1,
+        pageSize: null,
+        name: 'test',
+      }
+      let apiFilterRes = ApiFilter.buildParams(filter_map, filters)
+      assert.equal(Object.keys(apiFilterRes).includes('page_size'), false)
     })
   })
 })

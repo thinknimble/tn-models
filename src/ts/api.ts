@@ -32,7 +32,7 @@ export default class ModelAPI {
     //@ts-ignore
     return this.constructor.client
   }
-  list({ filters = {}, pagination = {} }: FiltersPaginationQuery) {
+  list<T = any>({ filters = {}, pagination = {} }: FiltersPaginationQuery): Promise<T> {
     //@ts-ignore
     const url = this.constructor.ENDPOINT
     //@ts-ignore
