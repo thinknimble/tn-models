@@ -13,7 +13,7 @@ export default class Model<T = any> {
     static getReadOnlyFields(): string[];
     static create(opts?: {}): Model<any>;
     static fromAPI(json?: {}): Model<any>;
-    static toAPI(obj: any, fields?: string[], excludeFields?: string[]): any;
+    static toAPI(obj: any, fields?: string[], excludeFields?: string[]): {} | undefined;
     static createCollection<T>(opts: ICollectionKwargs): CollectionManager<T>;
     duplicate(): any;
     newCopy(): any;
