@@ -21,8 +21,8 @@ export interface IPagination {
   previous: null | string
   size: number
   copy(): IPagination
-  update(data: any): Pagination
-  calcTotalPages(pagination: any): number
+  update(data: unknown): Pagination
+  calcTotalPages(pagination: unknown): number
   setNextPage(): void
   setPrevPage(): void
   get hasNextPage(): boolean
@@ -38,7 +38,7 @@ export default class Pagination implements IPagination {
   previous: null | string
   size: number
   constructor(opts = {}) {
-    let options = { ...PaginationDefaults, ...opts }
+    const options = { ...PaginationDefaults, ...opts }
     this.page = options.page
     this.totalCount = options.totalCount
     this.next = options.next
@@ -58,7 +58,7 @@ export default class Pagination implements IPagination {
     return Object.assign(this.copy(), data)
   }
 
-  calcTotalPages(pagination: any): number {
+  calcTotalPages(pagination: IPagination): number {
     const { totalCount, size } = pagination
     if (!totalCount) {
       return 0

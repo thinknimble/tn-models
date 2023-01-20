@@ -1,10 +1,10 @@
-import Pagination, { IPagination } from './pagination';
+import Pagination, { IPagination } from "./pagination";
 export interface ICollectionKwargs {
     list: any[];
     pagination: IPagination;
     refreshing: boolean;
     loadingNextPage: boolean;
-    filters: {};
+    filters: object;
     ModelClass: null | any;
 }
 export interface ICollectionManager {
@@ -19,7 +19,7 @@ export default class CollectionManager<T> {
     pagination: IPagination;
     refreshing: boolean;
     loadingNextPage: boolean;
-    filters: {};
+    filters: object;
     ModelClass: null | any;
     constructor({ list, pagination, refreshing, loadingNextPage, filters, ModelClass, }?: {
         list?: never[] | undefined;
