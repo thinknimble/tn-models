@@ -1,4 +1,8 @@
-# ThinkNimble Models for Client-Side Apps
+# DEPRECATED: ThinkNimble Models for Client-Side Apps
+
+![No Maintenance Intended](https://img.shields.io/maintenance/no/2019.svg)
+
+Development of this version of tn-models has been discontinued. See new version here: https://github.com/thinknimble/tn-models-fp
 
 ## Installation
 
