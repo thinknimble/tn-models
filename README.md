@@ -2,7 +2,7 @@
 
 ![No Maintenance Intended](https://img.shields.io/maintenance/no/2024.svg)
 
-## Development of this version of tn-models has been discontinued. See new version here: https://github.com/thinknimble/tn-models-fp
+## ⚠️ Development of this version of tn-models has been discontinued. See new version here: https://github.com/thinknimble/tn-models-fp
 
 ## Installation
 
