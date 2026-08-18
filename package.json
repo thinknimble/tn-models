@@ -20,12 +20,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thinknimble/tn-models-fp"
+    "url": "git+https://github.com/thinknimble/tn-models"
   },
   "keywords": [
     "javascript"
   ],
-  "homepage": "https://github.com/thinknimble/tn-models-fp",
+  "homepage": "https://github.com/thinknimble/tn-models",
   "dependencies": {
     "@thinknimble/tn-utils": "^2.0.1"
   },
