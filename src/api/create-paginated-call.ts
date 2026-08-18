@@ -89,7 +89,7 @@ export const createPaginatedServiceCall = <
       parsedInput = rest
     }
     const resolvedUri =
-      parsedUrlParams && typeof uri === "function" ? uri(parsedUrlParams) : typeof uri !== "function" ? uri ?? "" : ""
+      parsedUrlParams && typeof uri === "function" ? uri(parsedUrlParams) : typeof uri !== "function" ? (uri ?? "") : ""
 
     const makeSlashEnding = (str: string) => {
       return str ? (str[str.length - 1] === "/" ? str : str + "/") : ""

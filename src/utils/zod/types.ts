@@ -84,14 +84,7 @@ export const zodPrimitivesList = [
 
 //! trying to use the above list to create these types is failing bc of the class nature of the zod types
 export type ZodPrimitives =
-  | z.ZodString
-  | z.ZodNumber
-  | z.ZodDate
-  | z.ZodBigInt
-  | z.ZodBoolean
-  | z.ZodNativeEnum<any>
-  | z.ZodUndefined
-  | z.ZodVoid
+  z.ZodString | z.ZodNumber | z.ZodDate | z.ZodBigInt | z.ZodBoolean | z.ZodNativeEnum<any> | z.ZodUndefined | z.ZodVoid
 
 type GetZodObjectType<T extends z.ZodRawShape> = ReturnType<typeof z.object<T>>
 
@@ -179,15 +172,17 @@ export type StripZodReadonly<T extends z.ZodRawShape, TUnwrap extends (keyof T)[
    *  -nothing to do-
    *  T
    */
-  [K in keyof T as K extends TUnwrap[number]
-    ? K
-    : T[K] extends z.ZodReadonly<any>
-      ? never
-      : T[K] extends z.ZodArray<infer TElement>
-        ? TElement extends z.ZodReadonly<any>
-          ? never
+  [
+    K in keyof T as K extends TUnwrap[number]
+      ? K
+      : T[K] extends z.ZodReadonly<any>
+        ? never
+        : T[K] extends z.ZodArray<infer TElement>
+          ? TElement extends z.ZodReadonly<any>
+            ? never
+            : K
           : K
-        : K]: T[K] extends z.ZodObject<any>
+  ]: T[K] extends z.ZodObject<any>
     ? HandleStripZodObjectReadonly<T[K]>
     : T[K] extends z.ZodArray<any>
       ? HandleStripZodArrayReadonly<T[K]>

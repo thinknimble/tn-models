@@ -154,9 +154,6 @@ describe("createPaginatedServiceCall", () => {
     //arrange
     const getSpy = vi.spyOn(mockedAxios, "get")
     const postSpy = vi.spyOn(mockedAxios, "post")
-    mockedAxios.get.mockResolvedValueOnce({
-      data: listResponse,
-    })
     mockedAxios.post.mockResolvedValueOnce({
       data: listResponse,
     })
@@ -187,9 +184,6 @@ describe("createPaginatedServiceCall", () => {
   it("calls api and posts with the right casing in its body", async () => {
     //arrange
     const postSpy = vi.spyOn(mockedAxios, "post")
-    mockedAxios.get.mockResolvedValueOnce({
-      data: listResponse,
-    })
     mockedAxios.post.mockResolvedValueOnce({
       data: listResponse,
     })
