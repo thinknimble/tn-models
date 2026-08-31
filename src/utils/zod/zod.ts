@@ -2,51 +2,58 @@ import { toSnakeCase } from "@thinknimble/tn-utils"
 import { z } from "zod"
 import { ZodPrimitives, ZodRawShapeToSnakedRecursive, zodPrimitivesList } from "./types"
 
-//! `instanceof` and `z.instanceof` (which might be using the built-in instanceof keyword) does not compile well when using this library in certain node environments so this has been causing a lot of trouble for some users and myself to debug. Will likely have to do
+/**
+ * Zod 4 type discrimination strategy:
+ * - `schema.type` is the public API returning lowercase strings (e.g. "string", "object", "array")
+ * - `schema._zod.def.type` mirrors the same value via internals
+ * - `ZodFirstPartyTypeKind` is empty in Zod 4 — we use string literals instead
+ * - Branding is purely a TypeScript-level feature in Zod 4 (no distinct runtime type)
+ */
 
-export const isZod = (input: unknown): input is z.ZodSchema & { _def: { typeName: unknown } } => {
-  //! we can't use `instanceof` due to some weird compilation error which we need to investigate. So we're going to old-school duck type here
+export const isZod = (input: unknown): input is z.ZodType & { type: string } => {
   return Boolean(
     input &&
     typeof input === "object" &&
-    "_def" in input &&
-    input._def &&
-    typeof input._def === "object" &&
-    "typeName" in input._def,
+    "_zod" in input &&
+    (input as any)._zod &&
+    typeof (input as any)._zod === "object" &&
+    typeof (input as any)._zod.def?.type === "string",
   )
 }
 export const isZodArray = (input: unknown): input is z.ZodArray<z.ZodTypeAny> => {
-  return isZod(input) && input._def?.typeName === z.ZodFirstPartyTypeKind.ZodArray
+  return isZod(input) && input.type === "array"
 }
 export const isZodObject = (input: unknown): input is z.ZodObject<z.ZodRawShape> => {
-  return isZod(input) && input._def?.typeName === z.ZodFirstPartyTypeKind.ZodObject
+  return isZod(input) && input.type === "object"
 }
 export const isZodOptional = (input: z.ZodTypeAny): input is z.ZodOptional<z.ZodTypeAny> => {
-  return isZod(input) && input._def?.typeName === z.ZodFirstPartyTypeKind.ZodOptional
+  return isZod(input) && input.type === "optional"
 }
 export const isZodNullable = (input: unknown): input is z.ZodNullable<z.ZodTypeAny> => {
-  return isZod(input) && input._def?.typeName === z.ZodFirstPartyTypeKind.ZodNullable
+  return isZod(input) && input.type === "nullable"
 }
 export const isZodPrimitive = (input: unknown): input is ZodPrimitives => {
-  return isZod(input) && zodPrimitivesList.some((inst) => input._def?.typeName === inst.name)
+  return isZod(input) && zodPrimitivesList.includes(input.type as (typeof zodPrimitivesList)[number])
 }
 export const isZodIntersection = (input: unknown): input is z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny> => {
-  return isZod(input) && input._def?.typeName === z.ZodFirstPartyTypeKind.ZodIntersection
+  return isZod(input) && input.type === "intersection"
 }
 export const isZodUnion = (input: unknown): input is z.ZodUnion<readonly [z.ZodTypeAny]> => {
-  return isZod(input) && input._def?.typeName === z.ZodFirstPartyTypeKind.ZodUnion
+  return isZod(input) && input.type === "union"
 }
-export const isZodBrand = (input: unknown): input is z.ZodBranded<any, any> => {
-  return isZod(input) && input._def?.typeName === z.ZodFirstPartyTypeKind.ZodBranded
+// Zod 4 branding is transparent at runtime — .brand() does not create a distinct schema type.
+// This guard always returns false. Branded schemas fall through to their underlying type handler.
+export const isZodBrand = (input: unknown): input is never => {
+  return false
 }
 export const isZodReadonly = (input: unknown): input is z.ZodReadonly<any> => {
-  return isZod(input) && input._def.typeName === z.ZodFirstPartyTypeKind.ZodReadonly
+  return isZod(input) && input.type === "readonly"
 }
 export const isZodVoid = (input: unknown): input is z.ZodVoid => {
-  return isZod(input) && input._def.typeName === z.ZodFirstPartyTypeKind.ZodVoid
+  return isZod(input) && input.type === "void"
 }
 export const isZodDefault = (input: unknown): input is z.ZodDefault<z.ZodTypeAny> => {
-  return isZod(input) && input._def.typeName === z.ZodFirstPartyTypeKind.ZodDefault
+  return isZod(input) && input.type === "default"
 }
 
 //TODO: we should probably revisit the types here but they seem not too friendly to tackle given the recursive nature of this operation
@@ -55,9 +62,7 @@ export function resolveRecursiveZod<T extends z.ZodTypeAny>(zod: T) {
   if (isZodReadonly(zod)) {
     return zodReadonlyToSnakeRecursive(zod)
   }
-  if (isZodBrand(zod)) {
-    return zodBrandToSnakeRecursive(zod)
-  }
+  // Zod 4: branding is transparent at runtime, no isZodBrand check needed
   if (isZodObject(zod)) {
     return zodObjectToSnakeRecursive(zod)
   }
@@ -126,20 +131,18 @@ export function zodObjectToSnakeRecursive<T extends z.ZodRawShape>(
       return [snakeCasedKey, resolveRecursiveZod(v)]
     }),
   ) as ZodRawShapeToSnakedRecursive<T>
-  return zodObj._def.unknownKeys === "passthrough" ? z.object(resultingShape).passthrough() : z.object(resultingShape)
+  // Zod 4: passthrough is indicated by a catchall of z.unknown(), not unknownKeys
+  const catchallType = (zodObj._def as any).catchall?.type
+  return catchallType === "unknown" ? z.object(resultingShape).passthrough() : z.object(resultingShape)
 }
 
 function zodReadonlyToSnakeRecursive<T extends z.ZodReadonly<any>>(zod: T): any {
   return resolveRecursiveZod(zod.unwrap()).readonly()
 }
 
-function zodBrandToSnakeRecursive<T extends z.ZodBranded<any, any>>(zodBrand: T): any {
-  //brand is just a static type thing so I don't think this is going to affect that much runtime...We're losing the brand information anyway so I think it would be good to document that users should just not use brands since they're sort of pointless in the context of the library. We're just getting around the runtime here.
-  return resolveRecursiveZod(zodBrand.unwrap()).brand()
-}
-
 function zodDefaultRecursive<T extends z.ZodDefault<z.ZodTypeAny>>(zodDefault: T): any {
   const innerType = zodDefault._def.innerType
   const defaultValue = zodDefault._def.defaultValue
-  return resolveRecursiveZod(innerType).default(defaultValue())
+  // Zod 4: defaultValue is the raw value, not a function
+  return resolveRecursiveZod(innerType).default(defaultValue)
 }
