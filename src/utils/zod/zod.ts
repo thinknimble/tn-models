@@ -20,25 +20,25 @@ export const isZod = (input: unknown): input is z.ZodType & { type: string } => 
     typeof (input as any)._zod.def?.type === "string",
   )
 }
-export const isZodArray = (input: unknown): input is z.ZodArray<z.ZodTypeAny> => {
+export const isZodArray = (input: unknown): input is z.ZodArray<z.ZodType> => {
   return isZod(input) && input.type === "array"
 }
 export const isZodObject = (input: unknown): input is z.ZodObject<z.ZodRawShape> => {
   return isZod(input) && input.type === "object"
 }
-export const isZodOptional = (input: z.ZodTypeAny): input is z.ZodOptional<z.ZodTypeAny> => {
+export const isZodOptional = (input: z.ZodType): input is z.ZodOptional<z.ZodType> => {
   return isZod(input) && input.type === "optional"
 }
-export const isZodNullable = (input: unknown): input is z.ZodNullable<z.ZodTypeAny> => {
+export const isZodNullable = (input: unknown): input is z.ZodNullable<z.ZodType> => {
   return isZod(input) && input.type === "nullable"
 }
 export const isZodPrimitive = (input: unknown): input is ZodPrimitives => {
   return isZod(input) && zodPrimitivesList.includes(input.type as (typeof zodPrimitivesList)[number])
 }
-export const isZodIntersection = (input: unknown): input is z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny> => {
+export const isZodIntersection = (input: unknown): input is z.ZodIntersection<z.ZodType, z.ZodType> => {
   return isZod(input) && input.type === "intersection"
 }
-export const isZodUnion = (input: unknown): input is z.ZodUnion<readonly [z.ZodTypeAny]> => {
+export const isZodUnion = (input: unknown): input is z.ZodUnion<readonly [z.ZodType]> => {
   return isZod(input) && input.type === "union"
 }
 // Zod 4 branding is transparent at runtime — .brand() does not create a distinct schema type.
@@ -52,12 +52,12 @@ export const isZodReadonly = (input: unknown): input is z.ZodReadonly<any> => {
 export const isZodVoid = (input: unknown): input is z.ZodVoid => {
   return isZod(input) && input.type === "void"
 }
-export const isZodDefault = (input: unknown): input is z.ZodDefault<z.ZodTypeAny> => {
+export const isZodDefault = (input: unknown): input is z.ZodDefault<z.ZodType> => {
   return isZod(input) && input.type === "default"
 }
 
 //TODO: we should probably revisit the types here but they seem not too friendly to tackle given the recursive nature of this operation
-export function resolveRecursiveZod<T extends z.ZodTypeAny>(zod: T) {
+export function resolveRecursiveZod<T extends z.ZodType>(zod: T) {
   //: ZodRecursiveResult<T>
   if (isZodReadonly(zod)) {
     return zodReadonlyToSnakeRecursive(zod)
@@ -88,33 +88,33 @@ export function resolveRecursiveZod<T extends z.ZodTypeAny>(zod: T) {
 }
 
 //! could not escape of these any here. in the three functions below
-function zodArrayRecursive<T extends z.ZodTypeAny>(zodArray: z.ZodArray<T>): any {
+function zodArrayRecursive<T extends z.ZodType>(zodArray: z.ZodArray<T>): any {
   //: InferZodArray<z.ZodArray<T>>
   const innerElement = zodArray.element
   return resolveRecursiveZod(innerElement).array()
 }
 
-function zodNullableRecursive<T extends z.ZodTypeAny>(zodNullable: z.ZodNullable<T>): any {
+function zodNullableRecursive<T extends z.ZodType>(zodNullable: z.ZodNullable<T>): any {
   // : InferZodNullable<z.ZodNullable<T>>
   const unwrapped = zodNullable.unwrap()
   return resolveRecursiveZod(unwrapped).nullable()
 }
 
-function zodOptionalRecursive<T extends z.ZodTypeAny>(zodOptional: z.ZodOptional<T>): any {
+function zodOptionalRecursive<T extends z.ZodType>(zodOptional: z.ZodOptional<T>): any {
   // : InferZodOptional<z.ZodOptional<T>>
   const unwrapped = zodOptional.unwrap()
   return resolveRecursiveZod(unwrapped).optional()
 }
 
-function zodIntersectionRecursive<T extends z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>>(zod: T): any {
+function zodIntersectionRecursive<T extends z.ZodIntersection<z.ZodType, z.ZodType>>(zod: T): any {
   const { left, right } = zod._def
   return resolveRecursiveZod(left).and(resolveRecursiveZod(right))
 }
 
-function zodUnionRecursive<T extends z.ZodUnion<readonly [z.ZodTypeAny]>>(zod: T): any {
+function zodUnionRecursive<T extends z.ZodUnion<readonly [z.ZodType]>>(zod: T): any {
   const allUnions = zod._def.options
   const remapped: unknown = allUnions.map((u) => resolveRecursiveZod(u))
-  return z.union(remapped as readonly [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]])
+  return z.union(remapped as readonly [z.ZodType, z.ZodType, ...z.ZodType[]])
 }
 
 //TODO: why are we not using `resolveRecursiveZod` as the main method instead..
@@ -128,12 +128,12 @@ export function zodObjectToSnakeRecursive<T extends z.ZodRawShape>(
   const resultingShape = Object.fromEntries(
     Object.entries(zodObj.shape).map(([k, v]) => {
       const snakeCasedKey = toSnakeCase(k)
-      return [snakeCasedKey, resolveRecursiveZod(v)]
+      return [snakeCasedKey, resolveRecursiveZod(v as z.ZodType)]
     }),
   ) as ZodRawShapeToSnakedRecursive<T>
   // Zod 4: passthrough is indicated by a catchall of z.unknown(), not unknownKeys
   const catchallType = (zodObj._def as any).catchall?.type
-  return catchallType === "unknown" ? z.object(resultingShape).passthrough() : z.object(resultingShape)
+  return (catchallType === "unknown" ? z.object(resultingShape).passthrough() : z.object(resultingShape)) as z.ZodObject<ZodRawShapeToSnakedRecursive<T>>
 }
 
 function zodReadonlyToSnakeRecursive<T extends z.ZodReadonly<any>>(zod: T): any {
@@ -150,7 +150,7 @@ function snakeCaseKeysDeep(value: unknown): unknown {
   return value
 }
 
-function zodDefaultRecursive<T extends z.ZodDefault<z.ZodTypeAny>>(zodDefault: T): any {
+function zodDefaultRecursive<T extends z.ZodDefault<z.ZodType>>(zodDefault: T): any {
   const innerType = zodDefault._def.innerType
   const defaultValue = zodDefault._def.defaultValue
   // Zod 4: defaultValue is the raw value, not a function.

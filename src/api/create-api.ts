@@ -374,28 +374,29 @@ export const createApi = <
   }
 
   //! this is a bit painful to look at but I feel it is a good UX so that we don't make Users go through updateBase params
+  type EntityId = GetInferredFromRaw<TApiEntityShape>["id"]
   const update = async (
-    args: Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>> & { id: string },
+    args: Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>> & { id: EntityId },
   ) => {
     return updateBase({ newValue: args, httpMethod: "patch", type: "partial" })
   }
   defineProperty(
     update,
     "replace",
-    async (args: GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields> & { id: string }) =>
+    async (args: GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields> & { id: EntityId }) =>
       updateBase({ newValue: args, httpMethod: "put", type: "total" }),
   )
-  defineProperty(update.replace, "asPartial", (inputs: Partial<GetInferredFromRaw<TApiEntityShape>> & { id: string }) =>
+  defineProperty(update.replace, "asPartial", (inputs: Partial<GetInferredFromRaw<TApiEntityShape>> & { id: EntityId }) =>
     updateBase({ newValue: inputs, httpMethod: "put", type: "partial" }),
   )
 
   const upsert = async (
-    args: TApiCreate | (Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>> & { id: string }),
+    args: TApiCreate | (Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>> & { id: EntityId }),
   ) => {
     if ("id" in args && args.id) {
       return updateBase({
         newValue: args as Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>> & {
-          id: string
+          id: EntityId
         },
       })
     } else {

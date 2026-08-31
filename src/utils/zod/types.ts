@@ -1,37 +1,37 @@
 import { SnakeCase } from "@thinknimble/tn-utils"
 import { z } from "zod"
 
-type InferZodArray<T extends z.ZodArray<z.ZodTypeAny>> =
+type InferZodArray<T extends z.ZodArray<z.core.SomeType>> =
   T extends z.ZodArray<infer TEl> ? z.ZodArray<ZodRecursiveResult<TEl>> : never
 
 type InferZodObject<T extends z.ZodObject<z.ZodRawShape>> =
   T extends z.ZodObject<infer TZodObj> ? z.ZodObject<ZodRawShapeToSnakedRecursive<TZodObj>> : never
 
-type InferZodOptional<T extends z.ZodOptional<z.ZodTypeAny>> =
+type InferZodOptional<T extends z.ZodOptional<z.core.SomeType>> =
   T extends z.ZodOptional<infer TOpt> ? z.ZodOptional<ZodRecursiveResult<TOpt>> : never
 
-type InferZodNullable<T extends z.ZodNullable<z.ZodTypeAny>> =
+type InferZodNullable<T extends z.ZodNullable<z.core.SomeType>> =
   T extends z.ZodNullable<infer TNull> ? z.ZodNullable<ZodRecursiveResult<TNull>> : never
 
-type InferZodIntersection<T extends z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>> =
+type InferZodIntersection<T extends z.ZodIntersection<z.core.SomeType, z.core.SomeType>> =
   T extends z.ZodIntersection<infer TLeft, infer TRight>
     ? z.ZodIntersection<ZodRecursiveResult<TLeft>, ZodRecursiveResult<TRight>>
     : never
 
-type InferZodUnionOptions<T extends readonly z.ZodTypeAny[]> = T["length"] extends 0
+type InferZodUnionOptions<T extends readonly z.core.SomeType[]> = T["length"] extends 0
   ? T
   : T extends readonly [infer TOpt, ...infer Rest]
-    ? TOpt extends z.ZodTypeAny
-      ? Rest extends readonly z.ZodTypeAny[]
+    ? TOpt extends z.core.SomeType
+      ? Rest extends readonly z.core.SomeType[]
         ? readonly [ZodRecursiveResult<TOpt>, ...InferZodUnionOptions<Rest>]
         : ZodRecursiveResult<TOpt>
       : never
     : T extends readonly [infer TOptAnother]
-      ? TOptAnother extends z.ZodTypeAny
+      ? TOptAnother extends z.core.SomeType
         ? ZodRecursiveResult<TOptAnother>
         : never
       : never
-type InferZodUnion<T extends z.ZodUnion<z.ZodUnionOptions>> =
+type InferZodUnion<T extends z.ZodUnion<readonly z.core.SomeType[]>> =
   T extends z.ZodUnion<infer TOpts> ? z.ZodUnion<InferZodUnionOptions<TOpts>> : never
 
 /**
@@ -40,35 +40,35 @@ type InferZodUnion<T extends z.ZodUnion<z.ZodUnionOptions>> =
 export type ZodRawShapeToSnakedRecursive<T extends z.ZodRawShape> = {
   [K in keyof T as SnakeCase<K>]: T[K] extends z.ZodRawShape
     ? never
-    : T[K] extends z.ZodOptional<z.ZodTypeAny>
+    : T[K] extends z.ZodOptional<z.core.SomeType>
       ? InferZodOptional<T[K]>
       : //check whether it is array or object, else just default to its type
-        T[K] extends z.ZodNullable<z.ZodTypeAny>
+        T[K] extends z.ZodNullable<z.core.SomeType>
         ? InferZodNullable<T[K]>
         : T[K] extends z.ZodObject<z.ZodRawShape>
           ? InferZodObject<T[K]>
-          : T[K] extends z.ZodArray<z.ZodTypeAny>
+          : T[K] extends z.ZodArray<z.core.SomeType>
             ? InferZodArray<T[K]>
-            : T[K] extends z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
+            : T[K] extends z.ZodIntersection<z.core.SomeType, z.core.SomeType>
               ? InferZodIntersection<T[K]>
-              : T[K] extends z.ZodUnion<z.ZodUnionOptions>
+              : T[K] extends z.ZodUnion<readonly z.core.SomeType[]>
                 ? InferZodUnion<T[K]>
                 : // : T[K] extends z.ZodBranded<infer TZod, string | number | symbol>
                   // ? TZod
                   T[K]
 }
-type ZodRecursiveResult<T extends z.ZodTypeAny> =
+type ZodRecursiveResult<T extends z.core.SomeType> =
   T extends z.ZodObject<z.ZodRawShape>
     ? InferZodObject<T>
-    : T extends z.ZodArray<z.ZodTypeAny>
+    : T extends z.ZodArray<z.core.SomeType>
       ? InferZodArray<T>
-      : T extends z.ZodOptional<z.ZodTypeAny>
+      : T extends z.ZodOptional<z.core.SomeType>
         ? InferZodOptional<T>
-        : T extends z.ZodNullable<z.ZodTypeAny>
+        : T extends z.ZodNullable<z.core.SomeType>
           ? InferZodNullable<T>
-          : T extends z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>
+          : T extends z.ZodIntersection<z.core.SomeType, z.core.SomeType>
             ? InferZodIntersection<T>
-            : T extends z.ZodUnion<z.ZodUnionOptions>
+            : T extends z.ZodUnion<readonly z.core.SomeType[]>
               ? InferZodUnion<T>
               : T
 
@@ -88,27 +88,33 @@ export const zodPrimitivesList = [
 
 //! trying to use the above list to create these types is failing bc of the class nature of the zod types
 export type ZodPrimitives =
-  z.ZodString | z.ZodNumber | z.ZodDate | z.ZodBigInt | z.ZodBoolean | z.ZodNativeEnum<any> | z.ZodUndefined | z.ZodVoid
+  z.ZodString | z.ZodNumber | z.ZodDate | z.ZodBigInt | z.ZodBoolean | z.ZodEnum<any> | z.ZodUndefined | z.ZodVoid
 
-type GetZodObjectType<T extends z.ZodRawShape> = ReturnType<typeof z.object<T>>
+/**
+ * Directly compute the inferred output type from a raw Zod shape.
+ * We avoid `z.infer<z.ZodObject<T>>` because Zod 4's `$InferObjectOutput` collapses
+ * shapes with a string index signature (from `z.ZodRawShape`) into `Record<string, ...>`,
+ * losing specific keys like "id". This direct mapped type preserves key information.
+ */
+type InferShape<T extends z.ZodRawShape> = {
+  [K in keyof T]: z.core.output<T[K]>
+}
 
 /**
  * Infer the shape type, removing readonly marks and inferring their inner types
  */
-export type GetInferredFromRaw<T extends z.ZodRawShape> = z.infer<GetZodObjectType<UnwrapZodReadonly<T>>>
+export type GetInferredFromRaw<T extends z.ZodRawShape> = InferShape<UnwrapZodReadonly<T>>
 
-export type GetInferredFromRawWithReadonly<T extends z.ZodRawShape> = z.infer<GetZodObjectType<T>>
+export type GetInferredFromRawWithReadonly<T extends z.ZodRawShape> = InferShape<T>
 
-export type GetInferredFromRawWithStripReadonly<T extends z.ZodRawShape> = z.infer<
-  GetZodObjectType<StripZodReadonly<T>>
->
+export type GetInferredFromRawWithStripReadonly<T extends z.ZodRawShape> = InferShape<StripZodReadonly<T>>
 
 export type PartializeShape<T extends z.ZodRawShape> = {
   [K in keyof T]: z.ZodOptional<T[K]>
 }
 export type InferShapeOrZod<T extends object> = T extends z.ZodRawShape
   ? GetInferredFromRaw<T>
-  : T extends z.ZodTypeAny
+  : T extends z.ZodType
     ? z.infer<T>
     : never
 
@@ -142,7 +148,9 @@ export type HandleZodReadonly<T extends z.ZodReadonly<any>> =
       ? HandleZodArrayReadonly<TROInner>
       : TROInner extends z.ZodObject<any>
         ? HandleZodObjectReadonly<TROInner>
-        : TROInner
+        : TROInner extends z.core.$ZodType
+          ? TROInner
+          : z.ZodType
     : never
 
 export type HandleZodObjectReadonly<T extends z.ZodObject<any>> =
@@ -155,8 +163,8 @@ export type HandleZodArrayReadonly<T extends z.ZodArray<any>> =
       : TElement extends z.ZodArray<any>
         ? z.ZodArray<HandleZodArrayReadonly<TElement>>
         : TElement extends z.ZodReadonly<infer TROInner>
-          ? z.ZodArray<TROInner>
-          : z.ZodArray<TElement>
+          ? z.ZodArray<TROInner extends z.core.$ZodType ? TROInner : z.ZodType>
+          : z.ZodArray<TElement extends z.core.$ZodType ? TElement : z.ZodType>
     : never
 
 /**strip readonly fields */

@@ -39,7 +39,7 @@ export const objectToSnakeCaseArr = <T extends object>(obj: T): SnakeCasedProper
   return Object.fromEntries(newEntries)
 }
 
-const createToApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodTypeAny>>(inputShape: T) => {
+const createToApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodType>>(inputShape: T) => {
   // Given that this is under our control, we should not do safe parse, if the parsing fails means something is wrong (you're not complying with the schema you defined)
 
   if (isZodArray(inputShape)) {
@@ -58,7 +58,7 @@ const createToApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArray
   if (isZodPrimitive(inputShape)) return
   return ((obj: object) => {
     try {
-      const result = zodObjectToSnakeRecursive(z.object(inputShape)).parse(objectToSnakeCaseArr(obj))
+      const result = zodObjectToSnakeRecursive(z.object(inputShape as z.ZodRawShape)).parse(objectToSnakeCaseArr(obj))
       return result
     } catch (e) {
       console.error(`${createToApiHandler.name} - error`, e)
@@ -67,7 +67,7 @@ const createToApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArray
   }) as ToApiCall<T>
 }
 
-const createFromApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodTypeAny>>({
+const createFromApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodType>>({
   outputShape,
   callerName,
   disableLoggingWarning,
@@ -103,8 +103,8 @@ const createFromApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArr
 }
 
 export function createApiUtils<
-  TInput extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodTypeAny>,
-  TOutput extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodTypeAny>,
+  TInput extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodType>,
+  TOutput extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodType>,
 >(
   args: { name: string; disableLoggingWarning?: boolean } & (
     { inputShape: TInput; outputShape: TOutput } | { inputShape: TInput } | { outputShape: TOutput }
@@ -208,7 +208,7 @@ export const removeReadonlyFields = <T extends z.ZodRawShape, TUnwrap extends (k
   shape: T,
   unwrap?: TUnwrap,
 ) => {
-  const nonReadonlyEntries: [key: string, value: z.ZodTypeAny][] = []
+  const nonReadonlyEntries: [key: string, value: z.core.$ZodType][] = []
   const allEntries = Object.entries(shape)
   for (const [k, v] of allEntries) {
     if (isZodReadonly(v)) {

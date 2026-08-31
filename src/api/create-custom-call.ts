@@ -11,7 +11,7 @@ import {
 
 type ResolveCustomServiceCallback<
   TInputShape extends z.ZodRawShape | ZodPrimitives = never,
-  TOutputShape extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodTypeAny> = never,
+  TOutputShape extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodType> = never,
   TFilters extends FiltersShape | z.ZodVoid = never,
   TCallType extends string = "",
   TShapeOrVoid extends ResolveShapeOrVoid<any, any, any> = ResolveShapeOrVoid<TInputShape, TOutputShape, TFilters>,
@@ -19,14 +19,14 @@ type ResolveCustomServiceCallback<
 
 type ResolveServiceCallFn<
   TInputShape extends z.ZodRawShape | ZodPrimitives = never,
-  TOutputShape extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodTypeAny> = never,
+  TOutputShape extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodType> = never,
   TFiltersShape extends FiltersShape | z.ZodVoid = never,
   TShapeOrVoid extends ResolveShapeOrVoid<any, any, any> = ResolveShapeOrVoid<TInputShape, TOutputShape, TFiltersShape>,
 > = ServiceCallFn<TShapeOrVoid["input"], TShapeOrVoid["output"], TShapeOrVoid["filters"]>
 
 export const createCustomServiceCall = <
   TInputShape extends z.ZodRawShape | ZodPrimitives = never,
-  TOutputShape extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodTypeAny> = never,
+  TOutputShape extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodType> = never,
   TFiltersShape extends FiltersShape = never,
 >(
   args:
@@ -55,7 +55,7 @@ export const createCustomServiceCall = <
 
 const standAlone = <
   TInputShape extends z.ZodRawShape | ZodPrimitives = never,
-  TOutputShape extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodTypeAny> = never,
+  TOutputShape extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodType> = never,
   TFiltersShape extends FiltersShape | z.ZodVoid = never,
 >(
   args: {
