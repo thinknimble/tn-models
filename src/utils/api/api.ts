@@ -107,9 +107,7 @@ export function createApiUtils<
   TOutput extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodTypeAny>,
 >(
   args: { name: string; disableLoggingWarning?: boolean } & (
-    | { inputShape: TInput; outputShape: TOutput }
-    | { inputShape: TInput }
-    | { outputShape: TOutput }
+    { inputShape: TInput; outputShape: TOutput } | { inputShape: TInput } | { outputShape: TOutput }
   ),
 ) {
   if (!("inputShape" in args || "outputShape" in args)) return {} as CallbackUtils<TInput, TOutput>
@@ -160,12 +158,12 @@ export const createCustomServiceCallHandler =
     ): argCheck is { pagination: Pagination } | { input: { pagination: Pagination } } =>
       Boolean(
         typeof argCheck === "object" &&
-          argCheck &&
-          ("pagination" in argCheck ||
-            ("input" in argCheck &&
-              typeof argCheck.input === "object" &&
-              argCheck.input &&
-              "pagination" in argCheck.input)),
+        argCheck &&
+        ("pagination" in argCheck ||
+          ("input" in argCheck &&
+            typeof argCheck.input === "object" &&
+            argCheck.input &&
+            "pagination" in argCheck.input)),
       )
     const expectsFilters = !isZodVoid(serviceCallOpts.filtersShape)
     const utils = createApiUtils({

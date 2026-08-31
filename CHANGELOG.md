@@ -1,5 +1,17 @@
 # @thinknimble/tn-models-fp
 
+## 4.1.3
+
+### Patch Changes
+
+- 36dbb7a: Correct the import examples in the README. Two of them told readers to import from `@thinknimble/tn-models-fp`, which is deprecated on npm and frozen at 2.14.0. The README ships in the package, so the npm page showed those examples too.
+
+## 4.1.2
+
+### Patch Changes
+
+- bbb4ed0: Point `repository` and `homepage` at the tn-models repository. Both still named the old tn-models-fp repository, so the links on the npm page sent readers to the previous name.
+
 ## 4.0.1
 
 ### Patch Changes
@@ -35,7 +47,6 @@
   Zod recently released a native way of handling readonly. Although this readonly is not exactly the same as what we call "readonly" from our db resources. It does allow us to mark fields as readonly and we can take advantage of this mark and make the corresponding type inferences to treat these fields as our own readonly.
 
   ## Migration guide
-
   - Upgrade Zod to >=3.23.8
   - Remove any `import {readonly} from '@thinknimble/tn-models'`
   - Replace any `readonly(zod)` with `zod.readonly()` which is the native way of doing this with zod
@@ -67,7 +78,6 @@
 - 2f61919: ## Migration Guide v2 - v3
 
   ### What's new?
-
   - Now all functions accept a single object as parameter. No more secondary parameters.
   - Improvements on the type layer ( non perceptible from user perspective). Removed all overloads for functions which were a pain to maintain. Now a single function definition makes the inference for all possibilities.
 
@@ -78,7 +88,6 @@
   The summary is as follows:
 
   #### `createCustomServiceCall`
-
   - The callback no longer is in the second parameter. Instead we provide it in the first parameter as a `cb` field
 
   ```diff
@@ -102,7 +111,6 @@
   ```
 
   #### createPaginatedServiceCall
-
   - options (`uri` and `httpMethod`) are no longer in the second parameter. Instead we pass them in an `opts` field in the first parameter.
 
   ```diff
@@ -119,7 +127,6 @@
   ```
 
   #### `createApi`
-
   - If you don't have any custom calls in the `createApi` call then you should be good ✅
   - If you do have custom calls, move the second parameter into a `customCalls` field in the first parameter.
 

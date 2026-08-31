@@ -252,7 +252,7 @@ export const todoApi = createApi({
 import {todoApi} from './services'
 import {useMutation} from '@tanstack/react-query'
 import {useState} from 'react'
-import { Pagination } from '@thinknimble/tn-models-fp'
+import { Pagination } from '@thinknimble/tn-models'
 
 const TodoManager = () => {
   const [selectedTodoId,setSelectedTodoId] = useState()
@@ -755,7 +755,7 @@ Unlike `createApi`, WebSockets don't have universal CRUD semantics, so there are
 
 ```typescript
 import { z } from "zod"
-import { createWSApi, WSClientLike } from "@thinknimble/tn-models-fp"
+import { createWSApi, WSClientLike } from "@thinknimble/tn-models"
 
 const chatApi = createWSApi({
   channel: "chat",
@@ -905,7 +905,7 @@ chatApi.on.userTyping((data) => {
 
 # Roadmap
 
-Check out the [ Issues tab ](https://github.com/thinknimble/tn-models-fp/issues) for incoming features and feature/request.
+Check out the [ Issues tab ](https://github.com/thinknimble/tn-models/issues) for incoming features and feature/request.
 
 Submit your own if you feel there's something we're missing!
 

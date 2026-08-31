@@ -8,11 +8,11 @@ export const isZod = (input: unknown): input is z.ZodSchema & { _def: { typeName
   //! we can't use `instanceof` due to some weird compilation error which we need to investigate. So we're going to old-school duck type here
   return Boolean(
     input &&
-      typeof input === "object" &&
-      "_def" in input &&
-      input._def &&
-      typeof input._def === "object" &&
-      "typeName" in input._def,
+    typeof input === "object" &&
+    "_def" in input &&
+    input._def &&
+    typeof input._def === "object" &&
+    "typeName" in input._def,
   )
 }
 export const isZodArray = (input: unknown): input is z.ZodArray<z.ZodTypeAny> => {
