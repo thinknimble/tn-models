@@ -140,9 +140,20 @@ function zodReadonlyToSnakeRecursive<T extends z.ZodReadonly<any>>(zod: T): any 
   return resolveRecursiveZod(zod.unwrap()).readonly()
 }
 
+function snakeCaseKeysDeep(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(snakeCaseKeysDeep)
+  if (value && typeof value === "object" && value.constructor === Object) {
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [toSnakeCase(k), snakeCaseKeysDeep(v)]),
+    )
+  }
+  return value
+}
+
 function zodDefaultRecursive<T extends z.ZodDefault<z.ZodTypeAny>>(zodDefault: T): any {
   const innerType = zodDefault._def.innerType
   const defaultValue = zodDefault._def.defaultValue
-  // Zod 4: defaultValue is the raw value, not a function
-  return resolveRecursiveZod(innerType).default(defaultValue)
+  // Zod 4: defaultValue is the raw value, not a function.
+  // Convert keys to snake_case so they match the recursively-resolved inner schema.
+  return resolveRecursiveZod(innerType).default(snakeCaseKeysDeep(defaultValue))
 }
