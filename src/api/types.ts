@@ -1,5 +1,4 @@
 import { SnakeCasedPropertiesDeep } from "@thinknimble/tn-utils"
-import { AxiosRequestConfig } from "axios"
 import { z } from "zod"
 import {
   And,
@@ -71,18 +70,21 @@ type CallbackFilters<
     : unknown
 
 type StringTrailingSlash = `${string}/`
-// Return type is intentionally widened to `Promise<any>` so that a real
-// AxiosInstance (axios >= 1.19 returns `Promise<AxiosResponseResult<T, R, D, P>>`)
-// is assignable, while any client-agnostic wrapper returning `Promise<AxiosResponse<T>>`
-// still satisfies the contract. Coupling to axios's concrete method types would
+// `AxiosLike` is a purely structural HTTP-client contract, not a projection of
+// axios's concrete method types. Both the `config` parameter and the return
+// type are intentionally widened to `any` so that:
+//   - a real AxiosInstance (axios >= 1.19 returns
+//     `Promise<AxiosResponseResult<T, R, D, P>>`, config `AxiosRequestConfig`)
+//     is assignable, and
+//   - a well-typed non-axios client (a fetch-style wrapper with its own config
+//     type, returning a plain `{ data }` object) is equally assignable — it does
+//     not have to match axios's `AxiosRequestConfig` or `AxiosResponseResult`.
+// Coupling `config` to `AxiosRequestConfig` would, under contravariance, force
+// every client's config parameter to be a supertype of axios's config and so
 // regress the non-axios client path. The `StringTrailingSlash` URL brand is kept
 // on the `url` parameter to guard against Django APPEND_SLASH redirects.
-type AxiosCall = <TUri extends StringTrailingSlash, D = any>(url: TUri, config?: AxiosRequestConfig<D>) => Promise<any>
-type BodyAxiosCall = <TUri extends StringTrailingSlash, D = any>(
-  url: TUri,
-  data?: D,
-  config?: AxiosRequestConfig<D>,
-) => Promise<any>
+type AxiosCall = <TUri extends StringTrailingSlash>(url: TUri, config?: any) => Promise<any>
+type BodyAxiosCall = <TUri extends StringTrailingSlash>(url: TUri, data?: any, config?: any) => Promise<any>
 
 export type AxiosLike = {
   get: AxiosCall

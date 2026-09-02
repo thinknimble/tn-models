@@ -1,4 +1,3 @@
-import { AxiosInstance } from "axios"
 import { z } from "zod"
 import {
   FiltersShape,
@@ -206,7 +205,7 @@ export const createApi = <
   TCustomServiceCalls extends Record<string, CustomServiceCallPlaceholder> = never,
 >(args: {
   baseUri: string
-  client: AxiosInstance
+  client: AxiosLike
   customCalls?: TCustomServiceCalls
   models?: {
     entity: TEntity
@@ -230,7 +229,7 @@ export const createApi = <
       ? slashEndingBaseUri.substring(0, slashEndingBaseUri.length - 1)
       : slashEndingBaseUri
   ) as `${string}/`
-  const axiosLikeClient = client as AxiosLike
+  const axiosLikeClient = client
 
   const modifiedCustomServiceCalls = customCalls
     ? (Object.fromEntries(
