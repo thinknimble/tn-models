@@ -3,8 +3,9 @@ id: trailing-slash-url-brand
 parent: axios-version-compat
 created: 2026-09-02T17:54:47Z
 priority: 1
-status: not_started
+status: in_progress
 branch: feature/axios-upgrade
+locked-by: builder-MacBook-Pro.local-76998-1788373586
 ---
 
 # Client method URLs keep the compile-time trailing-slash brand
