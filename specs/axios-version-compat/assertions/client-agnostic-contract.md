@@ -3,8 +3,9 @@ id: client-agnostic-contract
 parent: axios-version-compat
 created: 2026-09-02T17:54:47Z
 priority: 1
-status: not_started
+status: in_progress
 branch: feature/axios-upgrade
+locked-by: builder-MacBook-Pro.local-58183-1788373270
 ---
 
 # The client contract stays HTTP-client-agnostic
