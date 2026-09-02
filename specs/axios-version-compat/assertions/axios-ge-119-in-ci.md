@@ -4,7 +4,7 @@ parent: axios-version-compat
 created: 2026-09-02T17:54:47Z
 priority: 1
 status: not_started
-branch: axios-upgrade
+branch: feature/axios-upgrade
 ---
 
 # CI type-checks and tests against axios ≥ 1.19
