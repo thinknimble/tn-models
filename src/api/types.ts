@@ -1,5 +1,5 @@
 import { SnakeCasedPropertiesDeep } from "@thinknimble/tn-utils"
-import { AxiosRequestConfig, AxiosResponse } from "axios"
+import { AxiosRequestConfig } from "axios"
 import { z } from "zod"
 import {
   And,
@@ -71,15 +71,18 @@ type CallbackFilters<
     : unknown
 
 type StringTrailingSlash = `${string}/`
-type AxiosCall = <TUri extends StringTrailingSlash, T = any, R = AxiosResponse<T>, D = any>(
+// Return type is intentionally widened to `Promise<any>` so that a real
+// AxiosInstance (axios >= 1.19 returns `Promise<AxiosResponseResult<T, R, D, P>>`)
+// is assignable, while any client-agnostic wrapper returning `Promise<AxiosResponse<T>>`
+// still satisfies the contract. Coupling to axios's concrete method types would
+// regress the non-axios client path. The `StringTrailingSlash` URL brand is kept
+// on the `url` parameter to guard against Django APPEND_SLASH redirects.
+type AxiosCall = <TUri extends StringTrailingSlash, D = any>(url: TUri, config?: AxiosRequestConfig<D>) => Promise<any>
+type BodyAxiosCall = <TUri extends StringTrailingSlash, D = any>(
   url: TUri,
-  config?: AxiosRequestConfig<D>,
-) => Promise<R>
-type BodyAxiosCall = <TUri extends StringTrailingSlash, T = any, R = AxiosResponse<T>, D = any>(
-  url: StringTrailingSlash,
   data?: D,
   config?: AxiosRequestConfig<D>,
-) => Promise<R>
+) => Promise<any>
 
 export type AxiosLike = {
   get: AxiosCall

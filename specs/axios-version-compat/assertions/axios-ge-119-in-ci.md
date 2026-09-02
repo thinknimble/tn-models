@@ -3,8 +3,7 @@ id: axios-ge-119-in-ci
 parent: axios-version-compat
 created: 2026-09-02T17:54:47Z
 priority: 1
-status: in_progress
-locked-by: builder-MacBook-Pro.local-20323-1788372600
+status: done
 branch: feature/axios-upgrade
 ---
 
