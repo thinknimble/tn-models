@@ -3,8 +3,9 @@ id: pagination-adapter-config
 parent: list-pagination-override
 created: 2026-09-04T18:40:00Z
 priority: 1
-status: not_started
+status: in_progress
 branch: feature/list-pagination-override
+locked-by: builder-MacBook-Pro.local-93031-1788551866
 ---
 
 # createApi accepts an optional pagination adapter
