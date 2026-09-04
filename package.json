@@ -16,7 +16,8 @@
     "release": "pnpm run ci && changeset publish",
     "dev:watch": "tsup src/index.ts --format cjs,esm --dts --watch",
     "format:check": "prettier --check ./src",
-    "format:write": "prettier --write ./src"
+    "format:write": "prettier --write ./src",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.6",
+    "husky": "^9.1.7",
     "prettier": "^3.9.6",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",

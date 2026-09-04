@@ -3,8 +3,7 @@ id: husky-installed
 parent: precommit-hook
 created: 2026-09-04T17:00:00Z
 priority: 2
-status: in_progress
-locked-by: builder-MacBook-Pro-88981-1788542012
+status: done
 ---
 
 # Husky is installed and self-initializes on install
