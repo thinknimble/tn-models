@@ -76,7 +76,7 @@ type ZodRecursiveResult<T extends z.core.SomeType> =
  * Zod 4 primitive type identifiers. These match the `schema.type` string
  * returned by Zod 4's public API (e.g. z.string().type === "string").
  */
-export const zodPrimitivesList = ["string", "number", "date", "bigint", "boolean", "undefined", "void"] as const
+export const zodPrimitivesList = ["string", "number", "date", "bigint", "boolean", "enum", "undefined", "void"] as const
 
 //! trying to use the above list to create these types is failing bc of the class nature of the zod types
 export type ZodPrimitives =
@@ -84,13 +84,14 @@ export type ZodPrimitives =
 
 /**
  * Directly compute the inferred output type from a raw Zod shape.
- * We avoid `z.infer<z.ZodObject<T>>` because Zod 4's `$InferObjectOutput` collapses
- * shapes with a string index signature (from `z.ZodRawShape`) into `Record<string, ...>`,
- * losing specific keys like "id". This direct mapped type preserves key information.
+ * We route through `z.ZodObject` rather than a flat `{ [K in keyof T]: z.core.output<T[K]> }`
+ * mapping because a flat mapping drops the optional (`?`) modifier, making every key required
+ * (so `.optional()` fields would have to be passed explicitly). The inner
+ * `{ [K in keyof T]: T[K] }` remap strips the `z.ZodRawShape` string index signature that
+ * would otherwise make Zod 4's `$InferObjectOutput` collapse the result into
+ * `Record<string, ...>` and lose specific keys like "id".
  */
-type InferShape<T extends z.ZodRawShape> = {
-  [K in keyof T]: z.core.output<T[K]>
-}
+type InferShape<T extends z.ZodRawShape> = z.core.output<z.ZodObject<{ [K in keyof T]: T[K] }>>
 
 /**
  * Infer the shape type, removing readonly marks and inferring their inner types

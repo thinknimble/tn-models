@@ -78,6 +78,7 @@ describe("Zod 4 type guards", () => {
       expect(isZodPrimitive(z.bigint())).toBe(true)
       expect(isZodPrimitive(z.undefined())).toBe(true)
       expect(isZodPrimitive(z.void())).toBe(true)
+      expect(isZodPrimitive(z.enum(["a", "b"]))).toBe(true)
     })
     it("returns false for non-primitives", () => {
       expect(isZodPrimitive(z.object({}))).toBe(false)
@@ -140,7 +141,7 @@ describe("Zod 4 type guards", () => {
 
   describe("zodPrimitivesList", () => {
     it("contains valid Zod 4 primitive type identifiers", () => {
-      const expectedTypes = ["string", "number", "date", "bigint", "boolean", "undefined", "void"]
+      const expectedTypes = ["string", "number", "date", "bigint", "boolean", "enum", "undefined", "void"]
       expect(zodPrimitivesList).toEqual(expectedTypes)
     })
   })
