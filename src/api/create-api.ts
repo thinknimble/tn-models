@@ -5,6 +5,7 @@ import {
   GetInferredFromRawWithStripReadonly,
   IPagination,
   IsNever,
+  PaginationAdapter,
   StripZodReadonly,
   createApiUtils,
   createCustomServiceCallHandler,
@@ -224,6 +225,11 @@ export const createApi = <
   options?: {
     disableTrailingSlash?: boolean
     disableWarningLogging?: boolean
+    /**
+     * Optional pagination adapter describing how a non-Django backend paginates.
+     * When omitted, `list` uses the default DRF request params and response envelope.
+     */
+    pagination?: PaginationAdapter<TEntity>
   }
 }): ApiService<TEntity, TCreate, TExtraFilters, TCustomServiceCalls> => {
   const { baseUri, client, customCalls, models, options } = args

@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { zodObjectToSnakeRecursive } from "./zod"
+import { GetInferredFromRaw, zodObjectToSnakeRecursive } from "./zod"
 
 //TODO: this needs cleanup. I am not happy with the usage of these across the library. Seems like we could have at least one of these less
 
@@ -28,6 +28,33 @@ export const getPaginatedZod = <T extends z.ZodRawShape>(zodRawShape: T) =>
     previous: z.string().nullable(),
     results: z.array(z.object(zodRawShape)),
   })
+
+/**
+ * Describes how a non-Django backend paginates so `createApi`'s `list` (and
+ * `createPaginatedServiceCall`) can override the hardcoded DRF contract on both
+ * sides of the wire. When no adapter is supplied the default `{ page, pageSize }`
+ * request params and `{ count, next, previous, results }` response envelope apply.
+ *
+ * The adapter is generic over the entity raw shape so `getResults` stays typed as
+ * the entity array rather than `unknown[]`.
+ */
+export type PaginationAdapter<TEntity extends z.ZodRawShape = z.ZodRawShape> = {
+  /**
+   * Map the client-side pagination object to the backend's query params
+   * (e.g. `page`/`size` → `limit`/`offset`).
+   */
+  toRequestParams: (pagination: IPagination) => Record<string, unknown>
+  /**
+   * Given the entity zod, return the raw shape of the full response envelope
+   * for that backend (e.g. `{ items, total }` instead of DRF's envelope).
+   */
+  responseShape: (entityZod: z.ZodObject<TEntity>) => z.ZodRawShape
+  /**
+   * Extract the array of entity records from the parsed response envelope.
+   * Typed to the entity so `list`'s `results` remain the entity array.
+   */
+  getResults: (parsedEnvelope: unknown) => GetInferredFromRaw<TEntity>[]
+}
 
 const PaginationDefaults = {
   page: 1,
