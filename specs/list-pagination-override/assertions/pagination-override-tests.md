@@ -3,10 +3,9 @@ id: pagination-override-tests
 parent: list-pagination-override
 created: 2026-09-04T18:40:00Z
 priority: 2
-status: in_progress
+status: done
 depends-on: list-honors-adapter
 branch: feature/list-pagination-override
-locked-by: builder-MacBook-Pro.local-34152-1788553372
 ---
 
 # Pagination override is covered by tests
