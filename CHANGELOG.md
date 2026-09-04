@@ -1,5 +1,19 @@
 # @thinknimble/tn-models-fp
 
+## 5.0.0
+
+### Major Changes
+
+- Migrate from Zod 3 to Zod 4.
+
+  **Breaking:** the peer dependency is now `zod@^4.0.0`. Consumers must upgrade to Zod 4. No public API changes beyond the peer requirement — see `MIGRATION.md` for the upgrade path.
+
+  - Update peer dependency to `zod@^4.0.0`
+  - Type guards (`isZod*`) discriminate on Zod 4's `schema.type` strings instead of `_def.typeName` / `ZodFirstPartyTypeKind`
+  - Recursive snake/camel conversion updated for Zod 4 internals (catchall-based passthrough detection, raw `defaultValue`, transparent branding)
+  - TypeScript types move from `z.ZodTypeAny` to `z.ZodType` / `z.core.SomeType`
+  - Inferred shape types preserve optional (`?`) keys and enum primitives
+
 ## 4.2.0
 
 ### Minor Changes
