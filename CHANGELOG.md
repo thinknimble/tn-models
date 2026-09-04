@@ -1,4 +1,4 @@
-# @thinknimble/tn-models-fp
+# @thinknimble/tn-models
 
 ## 5.0.0
 
