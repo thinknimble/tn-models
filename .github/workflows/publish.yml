@@ -7,9 +7,9 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
-  id-token: write  # Required for OIDC
-  contents: write  # Required for changesets to create tags
-  pull-requests: write  # Required for changesets to open the release PR
+  id-token: write # Required for OIDC
+  contents: write # Required for changesets to create tags
+  pull-requests: write # Required for changesets to open the release PR
 
 jobs:
   publish:
@@ -37,4 +37,3 @@ jobs:
           # setup-node writes an .npmrc that reads this name, not NPM_TOKEN.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-

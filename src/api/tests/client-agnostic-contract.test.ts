@@ -34,9 +34,7 @@ type FetchLikeClient = {
   patchForm: (url: string, data?: unknown, config?: FetchConfig) => Promise<FetchResponse>
 }
 
-const makeCall =
-  () =>
-  async (): Promise<FetchResponse> => ({ data: {} })
+const makeCall = () => async (): Promise<FetchResponse> => ({ data: {} })
 
 const fetchClient: FetchLikeClient = {
   get: makeCall(),

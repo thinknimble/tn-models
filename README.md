@@ -118,7 +118,7 @@ const loginShape = {
 /**
  * Create your api
  * Each api has a create, retrieve, list method by default
- * They must be enabled by declaring an `entity` in the `models` field 
+ * They must be enabled by declaring an `entity` in the `models` field
  *
  * These methods are accessible through the api directly eg:
  * userApi.create({})
@@ -133,42 +133,36 @@ const loginShape = {
  * e.g userApi.csc.login({})
  */
 
-const customUpdate = createCustomServiceCall(
-  {
-    inputShape: partialUpdateShape,
-    outputShape: accountShape,
-    cb: async ({ client, slashEndingBaseUri, input, utils: { toApi, fromApi } }) => {
+const customUpdate = createCustomServiceCall({
+  inputShape: partialUpdateShape,
+  outputShape: accountShape,
+  cb: async ({ client, slashEndingBaseUri, input, utils: { toApi, fromApi } }) => {
     const { id, ...rest } = toApi(input)
     const res = await client.patch(`${slashEndingBaseUri}${id}/`, rest)
     return fromApi(res.data)
-    }
   },
-)
+})
 
-const login = createCustomServiceCall(
-  {
-    inputShape: loginShape,
-    outputShape: accountShape,
-    cb: async ({ client, slashEndingBaseUri, input, utils: { toApi, fromApi } }) => {
-      const data = toApi(input)
-      const res = await client.post(`api/login/`, rest)
-      return fromApi(res.data)
-    } 
+const login = createCustomServiceCall({
+  inputShape: loginShape,
+  outputShape: accountShape,
+  cb: async ({ client, slashEndingBaseUri, input, utils: { toApi, fromApi } }) => {
+    const data = toApi(input)
+    const res = await client.post(`api/login/`, rest)
+    return fromApi(res.data)
   },
-)
+})
 
 /**
  * There is no need for an output shape in this case
  */
-const deleteEntity = createCustomServiceCall(
-  {
-    inputShape: z.string().uuid(),
-    cb: async ({ client, slashEndingBaseUri, input }) => {
-      const res = await client.delete(`api/users/${input}/`)
-      return
-    } 
+const deleteEntity = createCustomServiceCall({
+  inputShape: z.string().uuid(),
+  cb: async ({ client, slashEndingBaseUri, input }) => {
+    const res = await client.delete(`api/users/${input}/`)
+    return
   },
-)
+})
 
 const userApi = createApi({
   client: axios.create(), // a client of your choice
@@ -187,10 +181,12 @@ const userApi = createApi({
 
     create: createShape,
   },
-  customCalls:{
+  customCalls: {
     // Additional (aka custom calls) methods are declared here
-    login, update, deleteEntity
-  }
+    login,
+    update,
+    deleteEntity,
+  },
 })
 
 /**
@@ -290,17 +286,15 @@ To do this you pass an object with the service callbacks. These should be create
 The `createCustomServiceCall` method takes the models for your input and output shapes of the call. Then there's a `cb` field callback that is powered up with multiple arguments that provide you with all the tools we think you need to make a type-safe call
 
 ```typescript
-const updatePartial = createCustomServiceCall(
-  {
-    inputShape: partialUpdateShape,
-    outputShape: entityShape,
-    cb: async ({ client, slashEndingBaseUri, input, utils: { toApi, fromApi } }) => {
-      const { id, ...rest } = toApi(input)
-      const res = await client.patch(`${slashEndingBaseUri}${id}`, rest)
-      return fromApi(res.data)
-    }
+const updatePartial = createCustomServiceCall({
+  inputShape: partialUpdateShape,
+  outputShape: entityShape,
+  cb: async ({ client, slashEndingBaseUri, input, utils: { toApi, fromApi } }) => {
+    const { id, ...rest } = toApi(input)
+    const res = await client.patch(`${slashEndingBaseUri}${id}`, rest)
+    return fromApi(res.data)
   },
-)
+})
 ```
 
 # API reference
@@ -458,28 +452,24 @@ Without this function, you cannot add custom service calls. This was designed as
 
 ```typescript
 // from tn-models-client sample repo
-const deleteTodo = createCustomServiceCall(
-  {
-    inputShape: z.number(), //define your input shape (in this case is a ZodPrimitive)
-    cb: async ({ input, client, slashEndingBaseUri }) => {
-      //you get your parsed input, the axios client and the base uri you defined in `createApi`
-      await client.delete(`${slashEndingBaseUri}${input}`)
-    }
+const deleteTodo = createCustomServiceCall({
+  inputShape: z.number(), //define your input shape (in this case is a ZodPrimitive)
+  cb: async ({ input, client, slashEndingBaseUri }) => {
+    //you get your parsed input, the axios client and the base uri you defined in `createApi`
+    await client.delete(`${slashEndingBaseUri}${input}`)
   },
-)
+})
 
-const updatePartial = createCustomServiceCall(
-  {
-    inputShape: partialUpdateZodRaw, //you can also pass `ZodRawShape`s
-    outputShape: entityZodRaw,
-    cb:   async ({ client, slashEndingBaseUri, input, utils: { toApi, fromApi } }) => {
-      // we provide util methods to convert from and to api within your custom call so have you them in handy to use here.
-      const { id, ...rest } = toApi(input)
-      const res = await client.patch(`${slashEndingBaseUri}${id}`, rest)
-      return fromApi(res.data)
-    }
+const updatePartial = createCustomServiceCall({
+  inputShape: partialUpdateZodRaw, //you can also pass `ZodRawShape`s
+  outputShape: entityZodRaw,
+  cb: async ({ client, slashEndingBaseUri, input, utils: { toApi, fromApi } }) => {
+    // we provide util methods to convert from and to api within your custom call so have you them in handy to use here.
+    const { id, ...rest } = toApi(input)
+    const res = await client.patch(`${slashEndingBaseUri}${id}`, rest)
+    return fromApi(res.data)
   },
-)
+})
 ```
 
 </details>
@@ -489,21 +479,19 @@ To add these custom calls to your created api you simply pass them as object to 
 IG (same as first createApi example but with custom calls)
 
 ```ts
-export const todoApi = createApi(
-  {
-    client,
-    baseUri,
-    models: {
-      create: createZodRaw,
-      entity: entityZodRaw,
-    },
-    customCalls: {
-      // object with declared custom service calls
-      deleteTodo,
-      updatePartial,
-    }
-  }
-)
+export const todoApi = createApi({
+  client,
+  baseUri,
+  models: {
+    create: createZodRaw,
+    entity: entityZodRaw,
+  },
+  customCalls: {
+    // object with declared custom service calls
+    deleteTodo,
+    updatePartial,
+  },
+})
 ```
 
 We also added a `csc` alias in case you feel `customServiceCall` is too long.
@@ -652,16 +640,13 @@ const paginatedCallWithFilters = createPaginatedServiceCall({
     anotherExtraFilter: z.number(),
   },
 })
-const api = createApi(
-  {
-    baseUri,
-    client,
-    customCalls:{
-      paginatedCallWithFilters,
-
-    }
-  }
-)
+const api = createApi({
+  baseUri,
+  client,
+  customCalls: {
+    paginatedCallWithFilters,
+  },
+})
 const pagination = new Pagination({ page: 1, size: 20 })
 const myExtraFilter = "test"
 //act
@@ -687,28 +672,24 @@ Previous example simply showed a static uri but adding a `urlParams` to the `inp
 <summary>Example</summary>
 
 ```typescript
-const callWithUrlParams = createPaginatedServiceCall(
-  {
-    inputShape: {
-      urlParams: z.object({
-        someId: z.string(),
-      }),
-    },
-    outputShape,
-    opts: {
-      uri: ({ someId }) => `myUri/${someId}`,
-    }
-  }
-)
-const api = createApi(
-  {
-    baseUri,
-    client,
-    customCalls:{
-      callWithUrlParams,
-    }
-  }
-)
+const callWithUrlParams = createPaginatedServiceCall({
+  inputShape: {
+    urlParams: z.object({
+      someId: z.string(),
+    }),
+  },
+  outputShape,
+  opts: {
+    uri: ({ someId }) => `myUri/${someId}`,
+  },
+})
+const api = createApi({
+  baseUri,
+  client,
+  customCalls: {
+    callWithUrlParams,
+  },
+})
 const pagination = new Pagination({ page: 1, size: 20 })
 const randomId = faker.datatype.uuid()
 await api.csc.callWithUrlParams({ pagination, urlParams: { someId: randomId } }) // requests myUri/${randomId}

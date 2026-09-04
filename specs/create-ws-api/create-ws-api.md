@@ -26,11 +26,11 @@ const chatWs = createWSApi({
   operations: {
     send: {
       newMessage: { inputShape: { text: z.string(), roomId: z.string() } },
-      typing:     { inputShape: { roomId: z.string() } },
+      typing: { inputShape: { roomId: z.string() } },
     },
     receive: {
       messageReceived: { outputShape: { id: z.string(), text: z.string(), userId: z.string() } },
-      userJoined:      { outputShape: { userId: z.string(), roomId: z.string() } },
+      userJoined: { outputShape: { userId: z.string(), roomId: z.string() } },
     },
   },
 })
