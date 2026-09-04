@@ -7,9 +7,9 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
-  id-token: write  # Required for OIDC
-  contents: write  # Required for changesets to create tags
-  pull-requests: write  # Required for changesets to open the release PR
+  id-token: write # Required for OIDC
+  contents: write # Required for changesets to create tags
+  pull-requests: write # Required for changesets to open the release PR
 
 jobs:
   publish:
@@ -25,6 +25,9 @@ jobs:
           cache: "pnpm"
           registry-url: "https://registry.npmjs.org"
 
+      # Trusted Publishing (OIDC) needs npm >= 11.5.1; setup-node ships npm 10.
+      # Pin to npm 11 (npm 12 requires Node 22+, runner is Node 20).
+      - run: npm install -g npm@^11
       - run: pnpm install --frozen-lockfile
       - name: Create Release PR or Publish
         id: changesets
@@ -32,9 +35,7 @@ jobs:
         with:
           publish: pnpm run release
         env:
+          # Auth to npm is via OIDC (Trusted Publishing) — no NPM_TOKEN needed.
+          # GITHUB_TOKEN still required for changesets to open the release PR and push tags.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          # setup-node writes an .npmrc that reads this name, not NPM_TOKEN.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-

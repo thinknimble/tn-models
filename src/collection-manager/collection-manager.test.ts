@@ -26,10 +26,10 @@ const paginatedZod = getPaginatedSnakeCasedZod(entityZodShape)
 type PaginatedEntity = z.infer<typeof paginatedZod>
 
 const createFakeUser = () => ({
-  age: faker.datatype.number({ min: 16, max: 60 }),
-  first_name: faker.name.firstName(),
-  last_name: faker.name.lastName(),
-  id: faker.datatype.uuid(),
+  age: faker.number.int({ min: 16, max: 60 }),
+  first_name: faker.person.firstName(),
+  last_name: faker.person.lastName(),
+  id: faker.string.uuid(),
 })
 
 const mockedPaginatedEntitySnakeCased: PaginatedEntity = {
@@ -74,10 +74,10 @@ describe("collection manager v2 tests", () => {
       fetchList: testApi.list,
       list: [
         {
-          age: faker.datatype.number({ min: 16, max: 60 }),
-          firstName: faker.name.firstName(),
-          lastName: faker.name.lastName(),
-          id: faker.datatype.uuid(),
+          age: faker.number.int({ min: 16, max: 60 }),
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
+          id: faker.string.uuid(),
         },
       ],
       pagination: feedPagination,

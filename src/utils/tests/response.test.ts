@@ -7,9 +7,9 @@ describe("parseResponse", () => {
   it("does not obfuscate extra fields if data exceeds the amount of keys that zod expects", () => {
     //arrange
     const data = {
-      name: faker.name.firstName(),
-      last_name: faker.name.lastName(),
-      number_of_children: faker.datatype.number({ min: 1, max: 5 }),
+      name: faker.person.firstName(),
+      last_name: faker.person.lastName(),
+      number_of_children: faker.number.int({ min: 1, max: 5 }),
     }
     const zod = z.object({
       name: z.string(),

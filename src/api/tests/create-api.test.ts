@@ -128,7 +128,7 @@ describe("createApi", async () => {
       lastName: "Doe",
       firstName: "Jane",
     }
-    const randomId: string = faker.datatype.uuid()
+    const randomId: string = faker.string.uuid()
     const createResponse: SnakeCasedPropertiesDeep<GetInferredFromRaw<typeof entityZodShape>> = {
       age: createInput.age,
       last_name: createInput.lastName,
@@ -219,8 +219,8 @@ describe("createApi", async () => {
       const postSpy = vi.spyOn(mockedAxios, "post")
       const testCreate = {
         email: faker.internet.email(),
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
         password: faker.internet.password(),
       }
       const expected = {
@@ -231,7 +231,7 @@ describe("createApi", async () => {
           email: testCreate.email,
           first_name: testCreate.firstName,
           last_name: testCreate.lastName,
-          token: faker.datatype.uuid(),
+          token: faker.string.uuid(),
         },
       }
       mockedAxios.post.mockResolvedValueOnce(expected)
@@ -278,22 +278,22 @@ describe("createApi", async () => {
       })
       const testCreate = {
         nestedObject: {
-          firstName: faker.datatype.string(),
-          lastName: faker.datatype.string(),
+          firstName: faker.string.sample(),
+          lastName: faker.string.sample(),
         },
-        nestedArray: [{ id: faker.datatype.uuid(), textElement: faker.datatype.string() }],
+        nestedArray: [{ id: faker.string.uuid(), textElement: faker.string.sample() }],
       }
       const expected = {
         data: {
-          id: faker.datatype.uuid(),
-          datetime_created: faker.datatype.datetime().toISOString(),
-          last_edited: faker.datatype.datetime().toISOString(),
+          id: faker.string.uuid(),
+          datetime_created: faker.date.anytime().toISOString(),
+          last_edited: faker.date.anytime().toISOString(),
           nested_object: {
-            id: faker.datatype.uuid(),
-            datetime_created: faker.datatype.datetime().toISOString(),
-            last_edited: faker.datatype.datetime().toISOString(),
-            first_name: faker.datatype.string(),
-            last_name: faker.datatype.string(),
+            id: faker.string.uuid(),
+            datetime_created: faker.date.anytime().toISOString(),
+            last_edited: faker.date.anytime().toISOString(),
+            first_name: faker.string.sample(),
+            last_name: faker.string.sample(),
           },
         },
       }
@@ -369,7 +369,7 @@ describe("createApi", async () => {
     })
     it("should not obfuscate response fields even if they're not in the model", async () => {
       //arrange
-      const extraField = faker.datatype.string()
+      const extraField = faker.string.sample()
       mockedAxios.get.mockResolvedValueOnce({
         data: {
           count: 10,
@@ -505,7 +505,7 @@ describe("createApi", async () => {
           entity: entityZodShape,
         },
       })
-      const testId = faker.datatype.uuid()
+      const testId = faker.string.uuid()
       //act
       await api.remove(testId)
       //assert
@@ -522,7 +522,7 @@ describe("createApi", async () => {
           entity: entityZodShapeWithIdNumber,
         },
       })
-      const testId = faker.datatype.number()
+      const testId = faker.number.int()
       //act
       await api.remove(testId)
       //assert
@@ -621,9 +621,9 @@ describe("createApi", async () => {
       })
       //act
       const createFakeData = {
-        age: faker.datatype.number(),
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
+        age: faker.number.int(),
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
       }
       const res = await testApi.upsert(createFakeData)
       expect(postSpy).toHaveBeenCalledWith(`${testBaseUri}/`, objectToSnakeCaseArr(createFakeData))
@@ -635,9 +635,9 @@ describe("createApi", async () => {
         data: mockEntity1Snaked,
       })
       //act
-      const id = faker.datatype.uuid()
+      const id = faker.string.uuid()
       const createFakeData = {
-        lastName: faker.name.lastName(),
+        lastName: faker.person.lastName(),
       }
       const res = await testApi.upsert({
         ...createFakeData,

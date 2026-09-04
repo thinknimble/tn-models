@@ -31,11 +31,11 @@ export const entityZodShapeWithIdNumber = {
 type Entity = GetInferredFromRawWithReadonly<typeof entityZodShape>
 
 export const createEntityMock: () => Entity = () => {
-  const firstName = faker.name.firstName()
-  const lastName = faker.name.lastName()
+  const firstName = faker.person.firstName()
+  const lastName = faker.person.lastName()
   return {
-    id: faker.datatype.uuid(),
-    age: faker.datatype.number({ min: 1, max: 100 }),
+    id: faker.string.uuid(),
+    age: faker.number.int({ min: 1, max: 100 }),
     firstName,
     lastName,
     fullName: `${firstName} ${lastName}`,
