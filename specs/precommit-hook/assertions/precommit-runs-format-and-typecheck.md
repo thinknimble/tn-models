@@ -3,9 +3,8 @@ id: precommit-runs-format-and-typecheck
 parent: precommit-hook
 created: 2026-09-04T17:00:00Z
 priority: 2
-status: in_progress
+status: done
 depends-on: husky-installed
-locked-by: builder-MacBook-Pro-1353-1788542499
 ---
 
 # Pre-commit hook blocks commits that fail formatting or type checks
