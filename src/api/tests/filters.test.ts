@@ -9,7 +9,7 @@ describe("parseFilters", () => {
       companyCategory: z.string(),
     }
     const filters = {
-      companyCategory: faker.company.catchPhraseAdjective(),
+      companyCategory: faker.company.buzzAdjective(),
     }
     expect(parseFilters({ shape, filters })).toEqual({
       company_category: filters.companyCategory,
@@ -31,7 +31,7 @@ describe("parseFilters", () => {
       allNames: z.string().array(),
     }
     const filters = {
-      allNames: [faker.datatype.number(), faker.datatype.number()],
+      allNames: [faker.number.int(), faker.number.int()],
     }
     expect(() => {
       parseFilters({ shape, filters })

@@ -307,8 +307,8 @@ describe("createCustomServiceCall", () => {
     })
     const baseUri = "filters"
     const filters = {
-      testFilter: faker.datatype.string(),
-      testArrayFilter: [faker.datatype.string(), faker.datatype.string()],
+      testFilter: faker.string.sample(),
+      testArrayFilter: [faker.string.sample(), faker.string.sample()],
     }
     const api = createApi({
       client: mockedAxios,
@@ -470,8 +470,8 @@ describe("createCustomServiceCall", () => {
       })
       .array()
     const mockResponse: z.infer<typeof arrayOutputShape> = [
-      { testInput: faker.datatype.number() },
-      { testInput: faker.datatype.number() },
+      { testInput: faker.number.int() },
+      { testInput: faker.number.int() },
     ]
     const mockResponseSnake = mockResponse.map((item) => objectToSnakeCaseArr(item))
     const customCall = createCustomServiceCall({
@@ -492,7 +492,7 @@ describe("createCustomServiceCall", () => {
         customCall,
       },
     })
-    const fakeId = faker.datatype.uuid()
+    const fakeId = faker.string.uuid()
     const result = await api.csc.customCall(fakeId)
     expect(result).toStrictEqual(mockResponse)
   })
@@ -558,7 +558,7 @@ describe("createCustomServiceCall", () => {
           return utils.fromApi(res.data)
         },
       })
-      const testNumberInput = faker.datatype.number()
+      const testNumberInput = faker.number.int()
       //act
       const result = await testStandAloneCall({ testInput: testNumberInput })
       //assert
@@ -569,7 +569,7 @@ describe("createCustomServiceCall", () => {
     it("calls with right parameters: input object output primitive", async () => {
       //arrange
       const postSpy = vi.spyOn(mockedAxios, "post")
-      const mockResult = [faker.datatype.string(), faker.datatype.string()]
+      const mockResult = [faker.string.sample(), faker.string.sample()]
       mockedAxios.post.mockResolvedValueOnce({
         data: mockResult,
       })
@@ -588,7 +588,7 @@ describe("createCustomServiceCall", () => {
           return utils.fromApi(res.data)
         },
       })
-      const testNumberInput = faker.datatype.number()
+      const testNumberInput = faker.number.int()
       //act
       const result = await testStandAloneCall({ testInput: testNumberInput })
       //assert
@@ -618,7 +618,7 @@ describe("createCustomServiceCall", () => {
           await client.post(`${callName}/`, utils.toApi(input))
         },
       })
-      const testNumberInput = faker.datatype.number()
+      const testNumberInput = faker.number.int()
       //act
       const result = await testStandAloneCall({ testInput: testNumberInput })
       //assert
@@ -686,7 +686,7 @@ describe("createCustomServiceCall", () => {
       const mockResult = Array.from({ length: 5 })
         .fill(undefined)
         .map(() => {
-          return faker.datatype.number()
+          return faker.number.int()
         })
       mockedAxios.post.mockResolvedValueOnce({
         data: mockResult,
@@ -735,7 +735,7 @@ describe("createCustomServiceCall", () => {
           return utils.fromApi(res.data)
         },
       })
-      const testStrInput = faker.name.firstName()
+      const testStrInput = faker.person.firstName()
       //act
       const result = await testStandAloneCall(testStrInput)
       //assert
@@ -763,7 +763,7 @@ describe("createCustomServiceCall", () => {
           await client.post(`${callName}/${input}/`)
         },
       })
-      const testStrInput = faker.name.firstName()
+      const testStrInput = faker.person.firstName()
       //act
       const result = await testStandAloneCall(testStrInput)
       //assert
@@ -777,7 +777,7 @@ describe("createCustomServiceCall", () => {
       const mockResult = Array.from({ length: 5 })
         .fill(undefined)
         .map(() => {
-          return faker.datatype.string()
+          return faker.string.sample()
         })
       mockedAxios.post.mockResolvedValueOnce({
         data: mockResult,
@@ -796,7 +796,7 @@ describe("createCustomServiceCall", () => {
           return utils.fromApi(res.data)
         },
       })
-      const testStrInput = faker.name.firstName()
+      const testStrInput = faker.person.firstName()
       //act
       const result = await testStandAloneCall(testStrInput)
       //assert
@@ -836,8 +836,8 @@ describe("createCustomServiceCall", () => {
           return utils.fromApi(res.data)
         },
       })
-      const testNumberInput = faker.datatype.number()
-      const testFilter = faker.datatype.string(5)
+      const testNumberInput = faker.number.int()
+      const testFilter = faker.string.sample(5)
       //act
       const result = await testStandAloneCall({
         input: { testInput: testNumberInput },
@@ -859,7 +859,7 @@ describe("createCustomServiceCall", () => {
     it("calls with right parameters and filters: input object output primitive", async () => {
       //arrange
       const postSpy = vi.spyOn(mockedAxios, "post")
-      const mockResult = [faker.datatype.string(), faker.datatype.string()]
+      const mockResult = [faker.string.sample(), faker.string.sample()]
       mockedAxios.post.mockResolvedValueOnce({
         data: mockResult,
       })
@@ -881,8 +881,8 @@ describe("createCustomServiceCall", () => {
           return utils.fromApi(res.data)
         },
       })
-      const testNumberInput = faker.datatype.number()
-      const testFilter = faker.datatype.string()
+      const testNumberInput = faker.number.int()
+      const testFilter = faker.string.sample()
       //act
       const result = await testStandAloneCall({ input: { testInput: testNumberInput }, filters: { testFilter } })
       //assert
@@ -920,7 +920,7 @@ describe("createCustomServiceCall", () => {
           return utils.fromApi(res.data)
         },
       })
-      const testFilter = faker.datatype.string(5)
+      const testFilter = faker.string.sample(5)
       //act
       const result = await testStandAloneCall({ filters: { testFilter: testFilter } })
       //assert
@@ -940,7 +940,7 @@ describe("createCustomServiceCall", () => {
       const mockResult = Array.from({ length: 5 })
         .fill(undefined)
         .map(() => {
-          return faker.datatype.number()
+          return faker.number.int()
         })
       mockedAxios.post.mockResolvedValueOnce({
         data: mockResult,
@@ -960,7 +960,7 @@ describe("createCustomServiceCall", () => {
           return res.data
         },
       })
-      const testFilter = faker.datatype.string()
+      const testFilter = faker.string.sample()
       //act
       const result = await testStandAloneCall({ filters: { testFilter: testFilter } })
       //assert
@@ -995,8 +995,8 @@ describe("createCustomServiceCall", () => {
           return utils.fromApi(res.data)
         },
       })
-      const testStrInput = faker.name.firstName()
-      const testFilter = faker.datatype.string(5)
+      const testStrInput = faker.person.firstName()
+      const testFilter = faker.string.sample(5)
       //act
       const result = await testStandAloneCall({ input: testStrInput, filters: { testFilter } })
       //assert
@@ -1014,7 +1014,7 @@ describe("createCustomServiceCall", () => {
       const mockResult = Array.from({ length: 5 })
         .fill(undefined)
         .map(() => {
-          return faker.datatype.string()
+          return faker.string.sample()
         })
       mockedAxios.post.mockResolvedValueOnce({
         data: mockResult,
@@ -1034,8 +1034,8 @@ describe("createCustomServiceCall", () => {
           return utils.fromApi(res.data)
         },
       })
-      const testStrInput = faker.name.firstName()
-      const testFilter = faker.datatype.string()
+      const testStrInput = faker.person.firstName()
+      const testFilter = faker.string.sample()
       //act
       const result = await testStandAloneCall({ input: testStrInput, filters: { testFilter } })
       //assert

@@ -340,7 +340,7 @@ describe("createPaginatedServiceCall", () => {
       },
     })
     const pagination = new Pagination({ page: 1, size: 20 })
-    const randomId = faker.datatype.uuid()
+    const randomId = faker.string.uuid()
     //act
     await api.csc.callWithUrlParams({ pagination, urlParams: { someId: randomId } })
     //assert
@@ -384,7 +384,7 @@ describe("createPaginatedServiceCall", () => {
       },
     })
     const pagination = new Pagination({ page: 1, size: 20 })
-    const randomId = faker.datatype.uuid()
+    const randomId = faker.string.uuid()
     //act
     await api.csc.callWithUrlParamsWithFilter({
       input: {
@@ -425,7 +425,7 @@ describe("createPaginatedServiceCall", () => {
         testPaginatedCallWithFilters,
       },
     })
-    const mockValue = { id: faker.datatype.uuid(), nested_array: [{ nested_field: faker.datatype.string() }] }
+    const mockValue = { id: faker.string.uuid(), nested_array: [{ nested_field: faker.string.sample() }] }
 
     const getSpy = vi.spyOn(mockedAxios, "get")
     mockedAxios.get.mockResolvedValueOnce({
@@ -471,7 +471,7 @@ describe("createPaginatedServiceCall", () => {
         testTrivialPaginatedCall,
       },
     })
-    const mockValue = { id: faker.datatype.uuid(), extra_field: faker.datatype.string() }
+    const mockValue = { id: faker.string.uuid(), extra_field: faker.string.sample() }
 
     mockedAxios.get.mockResolvedValueOnce({
       data: { next: null, previous: null, count: 10, results: [mockValue] },

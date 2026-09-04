@@ -195,8 +195,8 @@ describe("createApiUtils", () => {
         .array(),
       name: "test input output array",
     })
-    const input = [{ testInput: faker.datatype.number() }, { testInput: faker.datatype.number() }]
-    const output = [{ test_output: faker.datatype.string() }, { test_output: faker.datatype.string() }]
+    const input = [{ testInput: faker.number.int() }, { testInput: faker.number.int() }]
+    const output = [{ test_output: faker.string.sample() }, { test_output: faker.string.sample() }]
     const [trialInput, trialOutput] = [utils.toApi(input), utils.fromApi(output)]
     expect(trialInput).toEqual([{ test_input: input[0]?.testInput }, { test_input: input[1]?.testInput }])
     expect(trialOutput).toEqual([{ testOutput: output[0]?.test_output }, { testOutput: output[1]?.test_output }])
