@@ -3,7 +3,8 @@ id: paginated-call-honors-adapter
 parent: list-pagination-override
 created: 2026-09-04T18:40:00Z
 priority: 2
-status: not_started
+status: in_progress
+locked-by: builder-MacBook-Pro.local-19734-1788552864
 depends-on: pagination-adapter-config
 branch: feature/list-pagination-override
 ---
