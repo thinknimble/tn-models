@@ -25,8 +25,9 @@ jobs:
           cache: "pnpm"
           registry-url: "https://registry.npmjs.org"
 
-      # Trusted Publishing (OIDC) needs npm >= 11.5.1; setup-node ships older npm.
-      - run: npm install -g npm@latest
+      # Trusted Publishing (OIDC) needs npm >= 11.5.1; setup-node ships npm 10.
+      # Pin to npm 11 (npm 12 requires Node 22+, runner is Node 20).
+      - run: npm install -g npm@^11
       - run: pnpm install --frozen-lockfile
       - name: Create Release PR or Publish
         id: changesets
