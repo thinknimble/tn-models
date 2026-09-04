@@ -3,8 +3,7 @@ id: paginated-call-honors-adapter
 parent: list-pagination-override
 created: 2026-09-04T18:40:00Z
 priority: 2
-status: in_progress
-locked-by: builder-MacBook-Pro.local-19734-1788552864
+status: done
 depends-on: pagination-adapter-config
 branch: feature/list-pagination-override
 ---
@@ -19,3 +18,5 @@ branch: feature/list-pagination-override
 - When supplied, request params come from `adapter.toRequestParams`, the response is validated against `adapter.responseShape(outputShape)`, and records come from `adapter.getResults`
 - When omitted, behavior is identical to today (`getPaginatedShape(outputShape)`, `{ page, pageSize }` params)
 - Records are camelCase-normalized consistently with the non-paginated path
+
+**Tests:** src/api/tests/paginated-call-honors-adapter.test.ts
