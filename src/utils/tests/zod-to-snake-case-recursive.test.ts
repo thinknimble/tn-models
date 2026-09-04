@@ -378,9 +378,7 @@ describe("zodToSnakeCaseShapeRecursive", () => {
     expect(result).toEqual({ first_name: "Alice", user_profile: { last_name: "Smith" } })
   })
   it("Handles arrays of objects with snake_cased keys", () => {
-    const schema = zodObjectToSnakeRecursive(
-      z.object({ itemList: z.array(z.object({ firstName: z.string() })) }),
-    )
+    const schema = zodObjectToSnakeRecursive(z.object({ itemList: z.array(z.object({ firstName: z.string() })) }))
     const result = schema.parse({ item_list: [{ first_name: "Bob" }] })
     expect(result).toEqual({ item_list: [{ first_name: "Bob" }] })
   })

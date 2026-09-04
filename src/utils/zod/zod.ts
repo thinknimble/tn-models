@@ -133,7 +133,9 @@ export function zodObjectToSnakeRecursive<T extends z.ZodRawShape>(
   ) as ZodRawShapeToSnakedRecursive<T>
   // Zod 4: passthrough is indicated by a catchall of z.unknown(), not unknownKeys
   const catchallType = (zodObj._def as any).catchall?.type
-  return (catchallType === "unknown" ? z.object(resultingShape).passthrough() : z.object(resultingShape)) as z.ZodObject<ZodRawShapeToSnakedRecursive<T>>
+  return (
+    catchallType === "unknown" ? z.object(resultingShape).passthrough() : z.object(resultingShape)
+  ) as z.ZodObject<ZodRawShapeToSnakedRecursive<T>>
 }
 
 function zodReadonlyToSnakeRecursive<T extends z.ZodReadonly<any>>(zod: T): any {
@@ -143,9 +145,7 @@ function zodReadonlyToSnakeRecursive<T extends z.ZodReadonly<any>>(zod: T): any 
 function snakeCaseKeysDeep(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(snakeCaseKeysDeep)
   if (value && typeof value === "object" && value.constructor === Object) {
-    return Object.fromEntries(
-      Object.entries(value).map(([k, v]) => [toSnakeCase(k), snakeCaseKeysDeep(v)]),
-    )
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [toSnakeCase(k), snakeCaseKeysDeep(v)]))
   }
   return value
 }

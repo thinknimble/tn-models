@@ -76,15 +76,7 @@ type ZodRecursiveResult<T extends z.core.SomeType> =
  * Zod 4 primitive type identifiers. These match the `schema.type` string
  * returned by Zod 4's public API (e.g. z.string().type === "string").
  */
-export const zodPrimitivesList = [
-  "string",
-  "number",
-  "date",
-  "bigint",
-  "boolean",
-  "undefined",
-  "void",
-] as const
+export const zodPrimitivesList = ["string", "number", "date", "bigint", "boolean", "undefined", "void"] as const
 
 //! trying to use the above list to create these types is failing bc of the class nature of the zod types
 export type ZodPrimitives =

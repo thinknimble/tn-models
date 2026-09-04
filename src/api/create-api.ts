@@ -385,8 +385,11 @@ export const createApi = <
     async (args: GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields> & { id: EntityId }) =>
       updateBase({ newValue: args, httpMethod: "put", type: "total" }),
   )
-  defineProperty(update.replace, "asPartial", (inputs: Partial<GetInferredFromRaw<TApiEntityShape>> & { id: EntityId }) =>
-    updateBase({ newValue: inputs, httpMethod: "put", type: "partial" }),
+  defineProperty(
+    update.replace,
+    "asPartial",
+    (inputs: Partial<GetInferredFromRaw<TApiEntityShape>> & { id: EntityId }) =>
+      updateBase({ newValue: inputs, httpMethod: "put", type: "partial" }),
   )
 
   const upsert = async (
