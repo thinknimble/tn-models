@@ -24,6 +24,15 @@ type EntityShape = z.ZodRawShape & {
   id: z.ZodString | z.ZodNumber | z.ZodReadonly<z.ZodString> | z.ZodReadonly<z.ZodNumber>
 }
 
+/**
+ * The inferred type of an entity's `id`. Derived straight from the shape's `id` schema
+ * rather than `GetInferredFromRaw<T>["id"]` because the inferred object type is not
+ * statically indexable by a literal key for a generic shape `T`.
+ */
+type EntityIdType<T extends z.ZodRawShape> = T extends { id: infer TId extends z.core.$ZodType }
+  ? z.core.output<TId>
+  : never
+
 type ApiService<
   TEntity extends EntityShape = never,
   TCreate extends z.ZodRawShape = never,
@@ -51,7 +60,7 @@ type RetrieveCallObj<TEntity extends EntityShape> = {
    * @param id resource id
    * @returns
    */
-  retrieve: (id: GetInferredFromRaw<TEntity>["id"]) => Promise<GetInferredFromRaw<TEntity>>
+  retrieve: (id: EntityIdType<TEntity>) => Promise<GetInferredFromRaw<TEntity>>
 }
 type ListCallObj<TEntity extends EntityShape, TExtraFilters extends FiltersShape = never> = {
   /**
@@ -136,7 +145,7 @@ type WithExtraFiltersModelCall<TEntity extends EntityShape = never, TExtraFilter
       ? ListCallObj<TEntity>
       : ListCallObj<TEntity, TExtraFilters>
 type WithRemoveModelCall<TEntity extends EntityShape = never> =
-  IsNever<TEntity> extends true ? unknown : { remove: (id: GetInferredFromRaw<TEntity>["id"]) => Promise<void> }
+  IsNever<TEntity> extends true ? unknown : { remove: (id: EntityIdType<TEntity>) => Promise<void> }
 type WithUpdateModelCall<TEntity extends EntityShape = never> =
   IsNever<TEntity> extends true ? unknown : UpdateCallObj<TEntity>
 type WithUpsertModelCall<TEntity extends EntityShape = never, TCreate extends z.ZodRawShape = never> =
@@ -286,7 +295,7 @@ export const createApi = <
     return utils.fromApi(res.data)
   }
 
-  const retrieve = async (id: GetInferredFromRaw<TApiEntityShape>["id"]) => {
+  const retrieve = async (id: EntityIdType<TApiEntityShape>) => {
     const { utils } = createApiUtils({
       name: retrieve.name,
       outputShape: models.entity,
@@ -325,7 +334,7 @@ export const createApi = <
     return { ...rawResponse, results: rawResponse.results.map((r) => objectToCamelCaseArr(r)) }
   }
 
-  const remove = (id: GetInferredFromRaw<TApiEntityShape>["id"]) => {
+  const remove = (id: EntityIdType<TApiEntityShape>) => {
     return client.delete(`${slashEndingBaseUri}${id}${parsedEndingSlash}`)
   }
 
@@ -339,7 +348,7 @@ export const createApi = <
     newValue: (TType extends "partial"
       ? Omit<Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>>, "id">
       : GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>) & {
-      id: GetInferredFromRaw<TApiEntityShape>["id"]
+      id: EntityIdType<TApiEntityShape>
     }
   }) => {
     if (!("id" in newValue)) {
@@ -373,28 +382,32 @@ export const createApi = <
   }
 
   //! this is a bit painful to look at but I feel it is a good UX so that we don't make Users go through updateBase params
+  type EntityId = EntityIdType<TApiEntityShape>
   const update = async (
-    args: Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>> & { id: string },
+    args: Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>> & { id: EntityId },
   ) => {
     return updateBase({ newValue: args, httpMethod: "patch", type: "partial" })
   }
   defineProperty(
     update,
     "replace",
-    async (args: GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields> & { id: string }) =>
+    async (args: GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields> & { id: EntityId }) =>
       updateBase({ newValue: args, httpMethod: "put", type: "total" }),
   )
-  defineProperty(update.replace, "asPartial", (inputs: Partial<GetInferredFromRaw<TApiEntityShape>> & { id: string }) =>
-    updateBase({ newValue: inputs, httpMethod: "put", type: "partial" }),
+  defineProperty(
+    update.replace,
+    "asPartial",
+    (inputs: Partial<GetInferredFromRaw<TApiEntityShape>> & { id: EntityId }) =>
+      updateBase({ newValue: inputs, httpMethod: "put", type: "partial" }),
   )
 
   const upsert = async (
-    args: TApiCreate | (Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>> & { id: string }),
+    args: TApiCreate | (Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>> & { id: EntityId }),
   ) => {
     if ("id" in args && args.id) {
       return updateBase({
         newValue: args as Partial<GetInferredFromRaw<typeof entityShapeWithoutReadonlyFields>> & {
-          id: string
+          id: EntityId
         },
       })
     } else {

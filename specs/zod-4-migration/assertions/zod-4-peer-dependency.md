@@ -3,7 +3,7 @@ id: zod-4-peer-dependency
 parent: zod-4-migration
 created: 2026-08-31T17:00:00Z
 priority: 1
-status: not_started
+status: done
 branch: feature/zod-4-migration
 ---
 

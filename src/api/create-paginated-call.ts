@@ -26,7 +26,7 @@ export const createPaginatedServiceCall = <
   TFilters extends FiltersShape = never,
   //things that are optional are better off being  never so that we can decide later whether we want to void them or not to exclude them from things
   TInput extends z.ZodRawShape | ZodPrimitives = never,
-  TReturnType extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodTypeAny> = ReturnType<
+  TReturnType extends z.ZodRawShape | ZodPrimitives | z.ZodArray<z.ZodType> = ReturnType<
     typeof getPaginatedZod<UnwrapZodReadonly<TOutput>>
   >["shape"],
 >({

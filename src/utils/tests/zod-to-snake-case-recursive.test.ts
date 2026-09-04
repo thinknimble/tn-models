@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { z } from "zod"
-import { ZodRawShapeToSnakedRecursive, zodObjectToSnakeRecursive } from "../zod"
+import { ZodRawShapeToSnakedRecursive, zodObjectToSnakeRecursive, resolveRecursiveZod } from "../zod"
 import { CamelCasedPropertiesDeep, SnakeCasedPropertiesDeep } from "@thinknimble/tn-utils"
 
 const setupTest = <T extends z.ZodRawShape>(zodShape: T) => {
@@ -366,5 +366,48 @@ describe("zodToSnakeCaseShapeRecursive", () => {
     expect(stringZod).toBeInstanceOf(z.ZodString)
     expect(objectZod.shape).toHaveProperty("number_zod")
     expect(objectZod.shape.number_zod).toBeInstanceOf(z.ZodNumber)
+  })
+  it("Returned schemas successfully .parse() matching data", () => {
+    const schema = zodObjectToSnakeRecursive(
+      z.object({
+        firstName: z.string(),
+        userProfile: z.object({ lastName: z.string() }),
+      }),
+    )
+    const result = schema.parse({ first_name: "Alice", user_profile: { last_name: "Smith" } })
+    expect(result).toEqual({ first_name: "Alice", user_profile: { last_name: "Smith" } })
+  })
+  it("Handles arrays of objects with snake_cased keys", () => {
+    const schema = zodObjectToSnakeRecursive(z.object({ itemList: z.array(z.object({ firstName: z.string() })) }))
+    const result = schema.parse({ item_list: [{ first_name: "Bob" }] })
+    expect(result).toEqual({ item_list: [{ first_name: "Bob" }] })
+  })
+  it("Preserves readonly wrapper through recursion", () => {
+    const inner = z.object({ firstName: z.string() }).readonly()
+    const schema = zodObjectToSnakeRecursive(z.object({ readonlyField: inner }))
+    const { readonly_field } = schema.shape
+    expect(readonly_field).toBeInstanceOf(z.ZodReadonly)
+    const unwrapped = readonly_field.unwrap()
+    expect(unwrapped).toBeInstanceOf(z.ZodObject)
+    expect(unwrapped.shape).toHaveProperty("first_name")
+    // Verify it parses
+    const result = schema.parse({ readonly_field: { first_name: "Test" } })
+    expect(result).toEqual({ readonly_field: { first_name: "Test" } })
+  })
+  it("Preserves default wrapper and re-applies default value", () => {
+    const inner = z.object({ firstName: z.string() }).default({ firstName: "DefaultName" })
+    const schema = zodObjectToSnakeRecursive(z.object({ profileField: inner }))
+    const { profile_field } = schema.shape
+    expect(profile_field).toBeInstanceOf(z.ZodDefault)
+    // Parse without providing the field — default should kick in
+    const result = schema.parse({})
+    expect(result.profile_field).toEqual({ first_name: "DefaultName" })
+  })
+  it("Passthrough schemas produce passthrough output", () => {
+    const passthroughObj = z.object({ firstName: z.string() }).passthrough()
+    const schema = zodObjectToSnakeRecursive(passthroughObj)
+    // Passthrough allows extra keys
+    const result = schema.parse({ first_name: "Alice", extra_key: 42 })
+    expect(result).toEqual({ first_name: "Alice", extra_key: 42 })
   })
 })
