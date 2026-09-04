@@ -10,10 +10,9 @@ import {
   createApiUtils,
   createCustomServiceCallHandler,
   defineProperty,
-  getPaginatedSnakeCasedZod,
+  getDefaultPaginationAdapter,
   getPaginatedZod,
   objectToCamelCaseArr,
-  paginationFiltersZodShape,
   parseFilters,
   parseResponse,
   removeReadonlyFields,
@@ -312,20 +311,22 @@ export const createApi = <
 
   // type test = BareApiService<TEntity, TCreate, TExtraFilters>["list"] // error on list not existing or resulting in a too complex structure for typescript to resolve
   //TODO: check if we can fix this params type
+  // The default adapter reproduces the Django REST Framework contract, so `list`
+  // runs a single code path whether or not a `pagination` adapter was supplied.
+  const paginationAdapter = (options?.pagination ??
+    getDefaultPaginationAdapter<TApiEntityShape>()) as PaginationAdapter<TApiEntityShape>
   const list = async (params: any) => {
     const filters = params ? params.filters : undefined
     const pagination = params ? params.pagination : undefined
     // Filters parsing, throws if the fields do not comply with the zod schema
 
     const filtersParsed = models.extraFilters ? parseFilters({ shape: models.extraFilters, filters }) : undefined
-    const paginationFilters = parseFilters({
-      shape: paginationFiltersZodShape,
-      filters: pagination ? { page: pagination.page, pageSize: pagination.size } : undefined,
-    })
+    const paginationParams = pagination ? paginationAdapter.toRequestParams(pagination) : undefined
     const allFilters =
-      filtersParsed || paginationFilters ? { ...(filtersParsed ?? {}), ...(paginationFilters ?? {}) } : undefined
+      filtersParsed || paginationParams ? { ...(filtersParsed ?? {}), ...(paginationParams ?? {}) } : undefined
 
-    const paginatedZod = getPaginatedSnakeCasedZod(models.entity)
+    const entityZod = z.object(models.entity) as z.ZodObject<TApiEntityShape>
+    const paginatedZod = z.object(paginationAdapter.responseShape(entityZod)).passthrough()
 
     const res = await axiosLikeClient.get(parsedBaseUri, {
       params: allFilters,
@@ -337,7 +338,8 @@ export const createApi = <
       onError: args.options?.disableWarningLogging ? null : undefined,
     })
 
-    return { ...rawResponse, results: rawResponse.results.map((r) => objectToCamelCaseArr(r)) }
+    const results = paginationAdapter.getResults(rawResponse)
+    return { ...rawResponse, results: results.map((r) => objectToCamelCaseArr(r)) }
   }
 
   const remove = (id: EntityIdType<TApiEntityShape>) => {

@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { paginationFiltersZodShape, parseFilters } from "./filters"
 import { GetInferredFromRaw, zodObjectToSnakeRecursive } from "./zod"
 
 //TODO: this needs cleanup. I am not happy with the usage of these across the library. Seems like we could have at least one of these less
@@ -55,6 +56,25 @@ export type PaginationAdapter<TEntity extends z.ZodRawShape = z.ZodRawShape> = {
    */
   getResults: (parsedEnvelope: unknown) => GetInferredFromRaw<TEntity>[]
 }
+
+/**
+ * The default pagination adapter — reproduces the hardcoded Django REST Framework
+ * contract that `list` used before adapters existed: `{ page, pageSize }` request
+ * params (snake-cased and stringified through `parseFilters`), the
+ * `{ count, next, previous, results }` envelope from `getPaginatedSnakeCasedZod`,
+ * and `results` as the record array. `list` falls back to this when no adapter is
+ * configured, so the default and override paths share a single code path instead of
+ * branching on whether an adapter was supplied.
+ */
+export const getDefaultPaginationAdapter = <TEntity extends z.ZodRawShape>(): PaginationAdapter<TEntity> => ({
+  toRequestParams: (pagination) =>
+    parseFilters({
+      shape: paginationFiltersZodShape,
+      filters: { page: pagination.page, pageSize: pagination.size },
+    }) ?? {},
+  responseShape: (entityZod) => getPaginatedShape(entityZod.shape, { allowPassthrough: true }),
+  getResults: (parsedEnvelope) => (parsedEnvelope as { results: GetInferredFromRaw<TEntity>[] }).results,
+})
 
 const PaginationDefaults = {
   page: 1,
