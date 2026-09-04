@@ -3,7 +3,8 @@ id: default-django-shape-unchanged
 parent: list-pagination-override
 created: 2026-09-04T18:40:00Z
 priority: 1
-status: not_started
+status: in_progress
+locked-by: builder-MacBook-Pro-local-4758-1788552313
 depends-on: pagination-adapter-config
 branch: feature/list-pagination-override
 ---
