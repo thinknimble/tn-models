@@ -15,19 +15,17 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20.x
+          node-version: 24.x
           cache: "pnpm"
           registry-url: "https://registry.npmjs.org"
 
-      # Trusted Publishing (OIDC) needs npm >= 11.5.1; setup-node ships npm 10.
-      # Pin to npm 11 (npm 12 requires Node 22+, runner is Node 20).
-      - run: npm install -g npm@^11
+      # Node 24 ships npm 11 (>= 11.5.1), which supports OIDC Trusted Publishing.
       - run: pnpm install --frozen-lockfile
       - name: Create Release PR or Publish
         id: changesets
