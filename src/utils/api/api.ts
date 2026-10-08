@@ -9,32 +9,61 @@ import {
   StripZodReadonly,
   ZodPrimitives,
   isZodArray,
+  isZodObject,
   isZodPrimitive,
   isZodReadonly,
+  isZodRecord,
   isZodVoid,
   resolveRecursiveZod,
+  unwrapZodWrappers,
   zodObjectToSnakeRecursive,
 } from "../zod"
 import { CallbackUtils, FromApiCall, ToApiCall } from "./types"
 
 //TODO: #194 these should probably move to tn-utils but will keep it here for a quick release
-export const objectToCamelCaseArr = <T extends object>(obj: T): CamelCasedPropertiesDeep<T> => {
+/**
+ * Recursively camelCase every key of an API response.
+ *
+ * When `schema` is supplied, the walk follows it: a field typed as `z.record(...)`
+ * is a leaf whose keys are *data*, not field names (the backend's rule blobs, free-form
+ * metadata, etc.), so its value is passed through verbatim — the camel↔snake round-trip
+ * is lossy for keys like `cpt_code_1` and would silently corrupt them. Without a schema
+ * the walk is blind and transforms every key, preserving the original behavior.
+ */
+export const objectToCamelCaseArr = <T extends object>(obj: T, schema?: z.ZodType): CamelCasedPropertiesDeep<T> => {
   if (typeof obj !== "object" || obj === null) return obj
-  if (Array.isArray(obj)) return obj.map((o) => objectToCamelCaseArr(o)) as CamelCasedPropertiesDeep<T>
-  const entries = Object.entries(obj)
+  const node = schema ? unwrapZodWrappers(schema) : undefined
+  if (node && isZodRecord(node)) return obj as unknown as CamelCasedPropertiesDeep<T>
+  if (Array.isArray(obj)) {
+    const element = node && isZodArray(node) ? node.element : undefined
+    return obj.map((o) => objectToCamelCaseArr(o, element)) as CamelCasedPropertiesDeep<T>
+  }
+  const shape = node && isZodObject(node) ? node.shape : undefined
   const newEntries = []
-  for (const [k, v] of entries) {
-    newEntries.push([toCamelCase(k), objectToCamelCaseArr(v)])
+  for (const [k, v] of Object.entries(obj)) {
+    const camelKey = toCamelCase(k)
+    // shapes are declared camelCase, so the child schema is keyed by the transformed name
+    newEntries.push([camelKey, objectToCamelCaseArr(v, shape?.[camelKey] as z.ZodType | undefined)])
   }
   return Object.fromEntries(newEntries)
 }
-export const objectToSnakeCaseArr = <T extends object>(obj: T): SnakeCasedPropertiesDeep<T> => {
+/**
+ * Recursively snake_case every key of a request body. See {@link objectToCamelCaseArr}
+ * for the schema-guided record passthrough; here the source keys are already camelCase
+ * (as declared on the input shape), so the child schema is looked up by the raw key.
+ */
+export const objectToSnakeCaseArr = <T extends object>(obj: T, schema?: z.ZodType): SnakeCasedPropertiesDeep<T> => {
   if (typeof obj !== "object" || obj === null) return obj
-  if (Array.isArray(obj)) return obj.map((o) => objectToSnakeCaseArr(o)) as SnakeCasedPropertiesDeep<T>
-  const entries = Object.entries(obj)
+  const node = schema ? unwrapZodWrappers(schema) : undefined
+  if (node && isZodRecord(node)) return obj as unknown as SnakeCasedPropertiesDeep<T>
+  if (Array.isArray(obj)) {
+    const element = node && isZodArray(node) ? node.element : undefined
+    return obj.map((o) => objectToSnakeCaseArr(o, element)) as SnakeCasedPropertiesDeep<T>
+  }
+  const shape = node && isZodObject(node) ? node.shape : undefined
   const newEntries = []
-  for (const [k, v] of entries) {
-    newEntries.push([toSnakeCase(k), objectToSnakeCaseArr(v)])
+  for (const [k, v] of Object.entries(obj)) {
+    newEntries.push([toSnakeCase(k), objectToSnakeCaseArr(v, shape?.[k] as z.ZodType | undefined)])
   }
   return Object.fromEntries(newEntries)
 }
@@ -46,7 +75,9 @@ const createToApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArray
     return ((arr: unknown[]) => {
       try {
         if (typeof arr?.[0] === "object") {
-          return resolveRecursiveZod(inputShape).parse(arr.map((i) => objectToSnakeCaseArr(i as object)))
+          return resolveRecursiveZod(inputShape).parse(
+            arr.map((i) => objectToSnakeCaseArr(i as object, inputShape.element)),
+          )
         }
       } catch (e) {
         console.error(`${createToApiHandler.name} - error`, e)
@@ -58,7 +89,8 @@ const createToApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArray
   if (isZodPrimitive(inputShape)) return
   return ((obj: object) => {
     try {
-      const result = zodObjectToSnakeRecursive(z.object(inputShape as z.ZodRawShape)).parse(objectToSnakeCaseArr(obj))
+      const inputZod = z.object(inputShape as z.ZodRawShape)
+      const result = zodObjectToSnakeRecursive(inputZod).parse(objectToSnakeCaseArr(obj, inputZod))
       return result
     } catch (e) {
       console.error(`${createToApiHandler.name} - error`, e)
@@ -84,7 +116,10 @@ const createFromApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArr
     return (obj: unknown[]) =>
       parseResponse({
         identifier: callerName,
-        data: typeof obj?.[0] === "object" && obj ? obj.map((o) => objectToCamelCaseArr(o as object)) : obj,
+        data:
+          typeof obj?.[0] === "object" && obj
+            ? obj.map((o) => objectToCamelCaseArr(o as object, outputShape.element))
+            : obj,
         zod: outputShape,
         onError: disableLoggingWarning ? null : undefined,
       })
@@ -92,11 +127,12 @@ const createFromApiHandler = <T extends z.ZodRawShape | ZodPrimitives | z.ZodArr
   //! This would send all other things that are not shapes (and not primitives) such as unions and intersections down the drain since we don't have support for those in outputShapes.
   if (isOutputZodPrimitive) return
   // Then it is a shape
+  const outputZod = z.object(outputShape)
   return ((obj: object) => {
     return parseResponse({
       identifier: callerName,
-      data: objectToCamelCaseArr(obj) ?? {},
-      zod: z.object(outputShape),
+      data: objectToCamelCaseArr(obj, outputZod) ?? {},
+      zod: outputZod,
       onError: disableLoggingWarning ? null : undefined,
     })
   }) as FromApiCall<T>

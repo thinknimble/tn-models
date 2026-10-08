@@ -115,9 +115,11 @@ export const createPaginatedServiceCall = <
       onError: opts?.disableLoggingWarning ? null : undefined,
     })
     //! although this claims not to be of the same type than our converted TOutput, it actually is, but all the added type complexity with camel casing util makes TS to think it is something different. It should be safe to cast this, we should definitely check this at runtime with tests
-    return { ...rawResponse, results: rawResponse.results.map((r) => objectToCamelCaseArr(r)) } as InferShapeOrZod<
-      ReturnType<typeof getPaginatedShape<TOutput>>
-    >
+    const entityZod = z.object(outputShape as z.ZodRawShape)
+    return {
+      ...rawResponse,
+      results: rawResponse.results.map((r) => objectToCamelCaseArr(r, entityZod)),
+    } as InferShapeOrZod<ReturnType<typeof getPaginatedShape<TOutput>>>
   }
   if (inputShape) {
     return {
