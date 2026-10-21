@@ -55,6 +55,24 @@ export const isZodVoid = (input: unknown): input is z.ZodVoid => {
 export const isZodDefault = (input: unknown): input is z.ZodDefault<z.ZodType> => {
   return isZod(input) && input.type === "default"
 }
+export const isZodRecord = (input: unknown): input is z.ZodRecord => {
+  return isZod(input) && input.type === "record"
+}
+
+/**
+ * Strip the wrapper schemas (optional/nullable/readonly/default) that sit in front
+ * of a field's actual type, so callers can inspect what the field really is —
+ * e.g. to detect a `z.record(...)` hiding behind `.nullable()`.
+ */
+export function unwrapZodWrappers<T extends z.ZodType>(zod: T): z.ZodType {
+  if (isZodOptional(zod) || isZodNullable(zod) || isZodReadonly(zod)) {
+    return unwrapZodWrappers(zod.unwrap())
+  }
+  if (isZodDefault(zod)) {
+    return unwrapZodWrappers(zod._def.innerType)
+  }
+  return zod
+}
 
 //TODO: we should probably revisit the types here but they seem not too friendly to tackle given the recursive nature of this operation
 export function resolveRecursiveZod<T extends z.ZodType>(zod: T) {

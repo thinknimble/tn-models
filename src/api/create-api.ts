@@ -331,7 +331,8 @@ export const createApi = <
       onError: args.options?.disableWarningLogging ? null : undefined,
     })
 
-    return { ...rawResponse, results: rawResponse.results.map((r) => objectToCamelCaseArr(r)) }
+    const entityZod = z.object(models.entity)
+    return { ...rawResponse, results: rawResponse.results.map((r) => objectToCamelCaseArr(r, entityZod)) }
   }
 
   const remove = (id: EntityIdType<TApiEntityShape>) => {
