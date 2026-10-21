@@ -3,7 +3,7 @@ id: pagination-override-tests
 parent: list-pagination-override
 created: 2026-09-04T18:40:00Z
 priority: 2
-status: not_started
+status: done
 depends-on: list-honors-adapter
 branch: feature/list-pagination-override
 ---
@@ -11,6 +11,8 @@ branch: feature/list-pagination-override
 # Pagination override is covered by tests
 
 Tests exercise a non-Django backend through the adapter and confirm the default path is untouched.
+
+**Tests:** src/api/tests/pagination-override.test.ts, src/api/tests/list-honors-adapter.test.ts, src/api/tests/paginated-call-honors-adapter.test.ts
 
 ## Success Criteria
 

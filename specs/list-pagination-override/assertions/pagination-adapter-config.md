@@ -3,13 +3,15 @@ id: pagination-adapter-config
 parent: list-pagination-override
 created: 2026-09-04T18:40:00Z
 priority: 1
-status: not_started
+status: done
 branch: feature/list-pagination-override
 ---
 
 # createApi accepts an optional pagination adapter
 
 `createApi`'s `options` accepts an optional pagination adapter describing how a non-Django backend paginates. When omitted, the API behaves exactly as today.
+
+**Tests:** src/api/tests/pagination-adapter-config.test.ts
 
 ## Success Criteria
 

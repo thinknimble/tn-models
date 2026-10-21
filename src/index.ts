@@ -10,4 +10,4 @@ export {
   getPaginatedZod,
   parseResponse,
 } from "./utils"
-export type { FromApiCall, GetInferredFromRaw, PaginationFilters, ToApiCall } from "./utils"
+export type { FromApiCall, GetInferredFromRaw, PaginationAdapter, PaginationFilters, ToApiCall } from "./utils"

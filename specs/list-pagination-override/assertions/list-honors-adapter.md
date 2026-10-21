@@ -3,12 +3,14 @@ id: list-honors-adapter
 parent: list-pagination-override
 created: 2026-09-04T18:40:00Z
 priority: 1
-status: not_started
+status: done
 depends-on: pagination-adapter-config
 branch: feature/list-pagination-override
 ---
 
 # list uses the pagination adapter when provided
+
+**Tests:** src/api/tests/list-honors-adapter.test.ts
 
 When a pagination adapter is configured, `createApi`'s `list` builds request params and parses the response envelope through the adapter instead of the Django defaults.
 

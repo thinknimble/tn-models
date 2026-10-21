@@ -4,15 +4,14 @@ import {
   InferShapeOrZod,
   IsNever,
   Pagination,
+  PaginationAdapter,
   UnknownIfNever,
   UnwrapZodReadonly,
   ZodPrimitives,
+  getDefaultPaginationAdapter,
   getPaginatedShape,
-  getPaginatedSnakeCasedZod,
   getPaginatedZod,
   objectToCamelCaseArr,
-  paginationFiltersZodShape,
-  parseFilters,
   parseResponse,
 } from "../utils"
 import { CustomServiceCallback, ResolveCustomServiceCallOpts } from "./types"
@@ -55,10 +54,21 @@ export const createPaginatedServiceCall = <
       : TInput extends { urlParams: z.ZodObject<any> }
         ? (input: z.infer<TInput["urlParams"]>) => string
         : string
+    /**
+     * Optional pagination adapter describing how a non-Django backend paginates.
+     * Same contract as `createApi`'s `options.pagination`. When omitted, the
+     * default Django REST Framework contract applies (`{ page, pageSize }` request
+     * params, `{ count, next, previous, results }` response envelope).
+     */
+    pagination?: PaginationAdapter<TOutput>
   }
 }): ResolveCustomServiceCallOpts<UnknownIfNever<TInput> & typeof paginationObjShape, TReturnType, TFilters> => {
   const uri = opts?.uri as ((input: unknown) => string) | undefined | string
   const httpMethod = opts?.httpMethod ?? "get"
+  // The default adapter reproduces the Django REST Framework contract, so the
+  // callback runs a single code path whether or not a `pagination` adapter was supplied.
+  const paginationAdapter = (opts?.pagination ??
+    getDefaultPaginationAdapter<UnwrapZodReadonly<TOutput>>()) as PaginationAdapter<UnwrapZodReadonly<TOutput>>
   const filtersShapeResolved = filtersShape && Object.keys(filtersShape).length ? filtersShape : undefined
   // The output shape should still be the camelCased one so as long as we make sure that we return the same we should be able to cast the result right?. OutputShape will always be camelCased from the user input...
   if (!outputShape) {
@@ -75,10 +85,7 @@ export const createPaginatedServiceCall = <
     ReturnType<typeof getPaginatedShape<TOutput>>,
     TFilters
   > = async ({ client, slashEndingBaseUri, utils, input, parsedFilters }) => {
-    const paginationFilters = input.pagination
-      ? { page: input.pagination.page, pageSize: input.pagination.size }
-      : undefined
-    const parsedPaginationFilters = parseFilters({ shape: paginationFiltersZodShape, filters: paginationFilters }) ?? {}
+    const parsedPaginationFilters = input.pagination ? paginationAdapter.toRequestParams(input.pagination) : {}
     const snakedCleanParsedFilters = { ...parsedPaginationFilters, ...(parsedFilters ?? {}) }
     let res
     let parsedInput = input
@@ -107,15 +114,17 @@ export const createPaginatedServiceCall = <
         params: snakedCleanParsedFilters,
       })
     }
-    const paginatedZod = getPaginatedSnakeCasedZod(outputShape)
+    const entityZod = z.object(outputShape) as z.ZodObject<UnwrapZodReadonly<TOutput>>
+    const paginatedZod = z.object(paginationAdapter.responseShape(entityZod)).passthrough()
     const rawResponse = parseResponse({
       data: res.data,
       identifier: "custom-paginated-call",
       zod: paginatedZod,
       onError: opts?.disableLoggingWarning ? null : undefined,
     })
+    const results = paginationAdapter.getResults(rawResponse)
     //! although this claims not to be of the same type than our converted TOutput, it actually is, but all the added type complexity with camel casing util makes TS to think it is something different. It should be safe to cast this, we should definitely check this at runtime with tests
-    return { ...rawResponse, results: rawResponse.results.map((r) => objectToCamelCaseArr(r)) } as InferShapeOrZod<
+    return { ...rawResponse, results: results.map((r) => objectToCamelCaseArr(r)) } as InferShapeOrZod<
       ReturnType<typeof getPaginatedShape<TOutput>>
     >
   }
