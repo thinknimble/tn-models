@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker"
 import { SnakeCasedPropertiesDeep } from "@thinknimble/tn-utils"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { z } from "zod"
 import {
   GetInferredFromRaw,
@@ -644,6 +644,50 @@ describe("createApi", async () => {
         id,
       })
       expect(patchSpy).toHaveBeenCalledWith(`${testBaseUri}/${id}/`, objectToSnakeCaseArr(createFakeData))
+    })
+  })
+})
+
+describe("createApi with a GUID id", () => {
+  const baseUri = "guid"
+  const zeroVersionGuid = "00000000-0000-0000-0000-000000000001"
+  const cases = [
+    { name: "z.guid()", entity: { id: z.guid(), fullName: z.string() } },
+    { name: "z.guid().readonly()", entity: { id: z.guid().readonly(), fullName: z.string() } },
+  ]
+  describe.each(cases)("$name", ({ entity }) => {
+    const api = createApi({ baseUri, client: mockedAxios, models: { entity } })
+    let debugSpy: MockInstance<typeof console.debug>
+    beforeEach(() => {
+      mockedAxios.post.mockReset()
+      mockedAxios.get.mockReset()
+      mockedAxios.patch.mockReset()
+      debugSpy = vi.spyOn(console, "debug").mockImplementation(() => undefined)
+    })
+    afterEach(() => {
+      debugSpy.mockRestore()
+    })
+    it.each([faker.string.uuid(), zeroVersionGuid])("creates, retrieves, updates and lists with id %s", async (id) => {
+      //arrange
+      const snaked = { id, full_name: "Jane Doe" }
+      const camel = { id, fullName: "Jane Doe" }
+      mockedAxios.post.mockResolvedValueOnce({ data: snaked })
+      mockedAxios.get.mockResolvedValueOnce({ data: snaked })
+      mockedAxios.patch.mockResolvedValueOnce({ data: snaked })
+      mockedAxios.get.mockResolvedValueOnce({ data: { count: 1, next: null, previous: null, results: [snaked] } })
+      //act
+      const created = await api.create({ fullName: "Jane Doe" })
+      const retrieved = await api.retrieve(id)
+      const updated = await api.update({ id, fullName: "Jane Doe" })
+      const listed = await api.list()
+      //assert
+      expect(created).toEqual(camel)
+      expect(retrieved).toEqual(camel)
+      expect(mockedAxios.get).toHaveBeenCalledWith(`${baseUri}/${id}/`)
+      expect(updated).toEqual(camel)
+      expect(mockedAxios.patch).toHaveBeenCalledWith(`${baseUri}/${id}/`, { full_name: "Jane Doe" })
+      expect(listed.results).toEqual([camel])
+      expect(debugSpy).not.toHaveBeenCalled()
     })
   })
 })

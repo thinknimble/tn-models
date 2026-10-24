@@ -3,7 +3,7 @@ id: guid-id-runtime
 parent: entity-id-string-formats
 created: 2026-10-24T01:23:01Z
 priority: 1
-status: not_started
+status: done
 depends-on: entity-id-accepts-string-formats
 branch: fix/entity-id-string-formats
 ---
@@ -20,3 +20,5 @@ An API made by `createApi` with an entity whose `id` is `z.guid()` or `z.guid().
 - `list` returns the camel-cased results with their GUID ids.
 - No call logs a response-mismatch warning for a valid GUID.
 - The existing string-id and number-id tests pass with no change.
+
+**Tests:** `src/api/tests/create-api.test.ts` ("createApi with a GUID id"). With `z.uuid()` in place of `z.guid()`, the version-0 cases fail.
