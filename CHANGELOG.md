@@ -1,5 +1,11 @@
 # @thinknimble/tn-models
 
+## 5.0.1
+
+### Patch Changes
+
+- e650a74: The entity `id` in `createApi` models now accepts Zod 4 string-format schemas, such as `z.guid()`, `z.uuid()`, `z.cuid()`, `z.ulid()`, and their `.readonly()` forms, which caused TS2322 before this fix. Runtime behavior does not change.
+
 ## 5.0.0
 
 ### Major Changes
