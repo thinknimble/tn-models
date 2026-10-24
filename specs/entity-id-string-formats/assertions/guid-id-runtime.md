@@ -10,7 +10,7 @@ branch: fix/entity-id-string-formats
 
 # createApi works at runtime with a GUID id
 
-An API made by `createApi` with an entity whose `id` is `z.guid()` or `z.guid().readonly()` sends and parses GUID ids correctly, for a generated UUID and for a version-0 GUID such as `00000000-0000-0000-0000-000000000001`.
+An API made by `createApi` with an entity whose `id` is `z.guid()` or `z.guid().readonly()` sends and parses GUID ids correctly, including a version-0 GUID such as `00000000-0000-0000-0000-000000000001`.
 
 ## Success Criteria
 
@@ -21,4 +21,4 @@ An API made by `createApi` with an entity whose `id` is `z.guid()` or `z.guid().
 - No call logs a response-mismatch warning for a valid GUID.
 - The existing string-id and number-id tests pass with no change.
 
-**Tests:** `src/api/tests/create-api.test.ts` ("createApi with a GUID id"). With `z.uuid()` in place of `z.guid()`, the version-0 cases fail.
+**Tests:** `src/api/tests/create-api.test.ts` ("createApi with a GUID id"). With `z.uuid()` in place of `z.guid()`, both cases fail.

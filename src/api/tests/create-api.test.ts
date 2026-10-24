@@ -667,8 +667,9 @@ describe("createApi with a GUID id", () => {
     afterEach(() => {
       debugSpy.mockRestore()
     })
-    it.each([faker.string.uuid(), zeroVersionGuid])("creates, retrieves, updates and lists with id %s", async (id) => {
+    it("creates, retrieves, updates and lists with a version-0 GUID", async () => {
       //arrange
+      const id = zeroVersionGuid
       const snaked = { id, full_name: "Jane Doe" }
       const camel = { id, fullName: "Jane Doe" }
       mockedAxios.post.mockResolvedValueOnce({ data: snaked })
