@@ -14,7 +14,7 @@ The `id` of `EntityShape` admits `z.ZodString`, `z.ZodStringFormat` (all Zod 4 s
 ## Success Criteria
 
 - `createApi` accepts an entity with `id: z.guid()` and with `id: z.guid().readonly()` with no type error.
-- `createApi` accepts an entity with `id` from `z.uuid()`, `z.cuid()`, and `z.ulid()`, and with `id: z.int()`.
+- `createApi` accepts an entity with `id: z.uuid()` and with `id: z.int()`. One string format other than GUID is enough, because all string formats share the `z.ZodStringFormat` base.
 - For a string-format id, the `id` parameter of `retrieve` and `remove` is `string`. For `z.int()` it is `number`.
 - An entity with `id: z.boolean()` is still a type error.
 - The type tests run in `pnpm lint` (`tsc`), and fail on `main` before the fix.
