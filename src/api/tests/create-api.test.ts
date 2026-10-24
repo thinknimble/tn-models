@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker"
 import { SnakeCasedPropertiesDeep } from "@thinknimble/tn-utils"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { z } from "zod"
 import {
   GetInferredFromRaw,
@@ -648,6 +648,51 @@ describe("createApi", async () => {
   })
 })
 
+describe("createApi with a GUID id", () => {
+  const baseUri = "guid"
+  const zeroVersionGuid = "00000000-0000-0000-0000-000000000001"
+  const cases = [
+    { name: "z.guid()", entity: { id: z.guid(), fullName: z.string() } },
+    { name: "z.guid().readonly()", entity: { id: z.guid().readonly(), fullName: z.string() } },
+  ]
+  describe.each(cases)("$name", ({ entity }) => {
+    const api = createApi({ baseUri, client: mockedAxios, models: { entity } })
+    let debugSpy: MockInstance<typeof console.debug>
+    beforeEach(() => {
+      mockedAxios.post.mockReset()
+      mockedAxios.get.mockReset()
+      mockedAxios.patch.mockReset()
+      debugSpy = vi.spyOn(console, "debug").mockImplementation(() => undefined)
+    })
+    afterEach(() => {
+      debugSpy.mockRestore()
+    })
+    it("creates, retrieves, updates and lists with a version-0 GUID", async () => {
+      //arrange
+      const id = zeroVersionGuid
+      const snaked = { id, full_name: "Jane Doe" }
+      const camel = { id, fullName: "Jane Doe" }
+      mockedAxios.post.mockResolvedValueOnce({ data: snaked })
+      mockedAxios.get.mockResolvedValueOnce({ data: snaked })
+      mockedAxios.patch.mockResolvedValueOnce({ data: snaked })
+      mockedAxios.get.mockResolvedValueOnce({ data: { count: 1, next: null, previous: null, results: [snaked] } })
+      //act
+      const created = await api.create({ fullName: "Jane Doe" })
+      const retrieved = await api.retrieve(id)
+      const updated = await api.update({ id, fullName: "Jane Doe" })
+      const listed = await api.list()
+      //assert
+      expect(created).toEqual(camel)
+      expect(retrieved).toEqual(camel)
+      expect(mockedAxios.get).toHaveBeenCalledWith(`${baseUri}/${id}/`)
+      expect(updated).toEqual(camel)
+      expect(mockedAxios.patch).toHaveBeenCalledWith(`${baseUri}/${id}/`, { full_name: "Jane Doe" })
+      expect(listed.results).toEqual([camel])
+      expect(debugSpy).not.toHaveBeenCalled()
+    })
+  })
+})
+
 describe("TS Tests", () => {
   it("CustomServiceCallRecordTest ts tests", () => {
     type tInputShape = { testInput: z.ZodString }
@@ -772,6 +817,32 @@ describe("TS Tests", () => {
       Expect<Equals<Parameters<apiNumId["remove"]>[0], number>>,
       Expect<Equals<Parameters<apiStrId["retrieve"]>[0], string>>,
       Expect<Equals<Parameters<apiNumId["retrieve"]>[0], number>>,
+    ]
+  })
+
+  it("accepts Zod 4 string and number format schemas as the id", () => {
+    const baseUri = "formatId"
+    const apiGuidId = createApi({ baseUri, client: mockedAxios, models: { entity: { id: z.guid() } } })
+    const apiReadonlyGuidId = createApi({
+      baseUri,
+      client: mockedAxios,
+      models: { entity: { id: z.guid().readonly() } },
+    })
+    const apiUuidId = createApi({ baseUri, client: mockedAxios, models: { entity: { id: z.uuid() } } })
+    const apiIntId = createApi({ baseUri, client: mockedAxios, models: { entity: { id: z.int() } } })
+    createApi({
+      baseUri,
+      client: mockedAxios,
+      models: {
+        //@ts-expect-error an id that is not a string or number schema is rejected
+        entity: { id: z.boolean() },
+      },
+    })
+    type tests = [
+      Expect<Equals<Parameters<(typeof apiGuidId)["retrieve"]>[0], string>>,
+      Expect<Equals<Parameters<(typeof apiReadonlyGuidId)["remove"]>[0], string>>,
+      Expect<Equals<Parameters<(typeof apiUuidId)["retrieve"]>[0], string>>,
+      Expect<Equals<Parameters<(typeof apiIntId)["retrieve"]>[0], number>>,
     ]
   })
 

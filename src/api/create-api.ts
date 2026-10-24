@@ -20,8 +20,14 @@ import {
 import { createCustomServiceCall } from "./create-custom-call"
 import { AxiosLike, CustomServiceCallPlaceholder, CustomServiceCallsRecord } from "./types"
 
+/**
+ * Zod 4 string formats (`z.guid()`, `z.uuid()`, `z.cuid()`, ...) extend `z.ZodStringFormat`, not `z.ZodString`.
+ * Number formats (`z.int()`, ...) extend `z.ZodNumber`.
+ */
+type EntityIdZod = z.ZodString | z.ZodStringFormat | z.ZodNumber
+
 type EntityShape = z.ZodRawShape & {
-  id: z.ZodString | z.ZodNumber | z.ZodReadonly<z.ZodString> | z.ZodReadonly<z.ZodNumber>
+  id: EntityIdZod | z.ZodReadonly<EntityIdZod>
 }
 
 /**
