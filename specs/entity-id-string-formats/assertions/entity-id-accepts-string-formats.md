@@ -3,7 +3,7 @@ id: entity-id-accepts-string-formats
 parent: entity-id-string-formats
 created: 2026-10-24T01:23:00Z
 priority: 1
-status: not_started
+status: done
 branch: fix/entity-id-string-formats
 ---
 
@@ -19,3 +19,5 @@ The `id` of `EntityShape` admits `z.ZodString`, `z.ZodStringFormat` (all Zod 4 s
 - An entity with `id: z.boolean()` is still a type error.
 - The type tests run in `pnpm lint` (`tsc`), and fail on `main` before the fix.
 - `CHANGELOG.md` has an `Unreleased` entry that suggests version 5.0.1.
+
+**Tests:** `src/api/tests/create-api.test.ts` ("accepts Zod 4 string and number format schemas as the id"), checked by `pnpm lint`.

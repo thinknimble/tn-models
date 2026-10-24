@@ -775,6 +775,36 @@ describe("TS Tests", () => {
     ]
   })
 
+  it("accepts Zod 4 string and number format schemas as the id", () => {
+    const baseUri = "formatId"
+    const apiGuidId = createApi({ baseUri, client: mockedAxios, models: { entity: { id: z.guid() } } })
+    const apiReadonlyGuidId = createApi({
+      baseUri,
+      client: mockedAxios,
+      models: { entity: { id: z.guid().readonly() } },
+    })
+    const apiUuidId = createApi({ baseUri, client: mockedAxios, models: { entity: { id: z.uuid() } } })
+    const apiCuidId = createApi({ baseUri, client: mockedAxios, models: { entity: { id: z.cuid() } } })
+    const apiUlidId = createApi({ baseUri, client: mockedAxios, models: { entity: { id: z.ulid() } } })
+    const apiIntId = createApi({ baseUri, client: mockedAxios, models: { entity: { id: z.int() } } })
+    createApi({
+      baseUri,
+      client: mockedAxios,
+      models: {
+        //@ts-expect-error an id that is not a string or number schema is rejected
+        entity: { id: z.boolean() },
+      },
+    })
+    type tests = [
+      Expect<Equals<Parameters<(typeof apiGuidId)["retrieve"]>[0], string>>,
+      Expect<Equals<Parameters<(typeof apiReadonlyGuidId)["remove"]>[0], string>>,
+      Expect<Equals<Parameters<(typeof apiUuidId)["retrieve"]>[0], string>>,
+      Expect<Equals<Parameters<(typeof apiCuidId)["retrieve"]>[0], string>>,
+      Expect<Equals<Parameters<(typeof apiUlidId)["retrieve"]>[0], string>>,
+      Expect<Equals<Parameters<(typeof apiIntId)["retrieve"]>[0], number>>,
+    ]
+  })
+
   it("yields right types when using readonly fields", () => {
     const entityShape = {
       id: z.string().readonly(),
