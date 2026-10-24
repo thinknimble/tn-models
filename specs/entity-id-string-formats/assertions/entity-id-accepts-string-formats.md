@@ -18,6 +18,6 @@ The `id` of `EntityShape` admits `z.ZodString`, `z.ZodStringFormat` (all Zod 4 s
 - For a string-format id, the `id` parameter of `retrieve` and `remove` is `string`. For `z.int()` it is `number`.
 - An entity with `id: z.boolean()` is still a type error.
 - The type tests run in `pnpm lint` (`tsc`), and fail on `main` before the fix.
-- `CHANGELOG.md` has an `Unreleased` entry that suggests version 5.0.1.
+- `.changeset/entity-id-string-formats.md` declares a `patch` release of `@thinknimble/tn-models` (5.0.1).
 
 **Tests:** `src/api/tests/create-api.test.ts` ("accepts Zod 4 string and number format schemas as the id"), checked by `pnpm lint`.
